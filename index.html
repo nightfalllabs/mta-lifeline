@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MTA: LifeLine v0.5.2 — Prehospital Trauma Decision Trainer</title>
+<title>MTA: LifeLine v0.5.3 — Prehospital Trauma Decision Trainer</title>
 <style>
 :root{
   /* clinical slate + monitor color coding (Philips convention) */
@@ -435,6 +435,39 @@ h2{font-size:.8rem;letter-spacing:.22em;text-transform:uppercase;color:var(--dim
 #game-grid.hc #speech,
 #game-grid.hc #logbox{ display:none !important; }
 #game-grid.hc #bottombar{ grid-template-columns:1fr !important; }
+/* ---- v0.5.3: kit tutorial overlay ---- */
+.kt-overlay{position:fixed;inset:0;background:rgba(4,8,12,.82);z-index:300;display:flex;align-items:center;
+  justify-content:center;padding:max(16px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom));overflow-y:auto;}
+.kt-card{background:var(--panel);border:1px solid var(--line);border-radius:10px;max-width:560px;width:100%;
+  max-height:92vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.5);}
+.kt-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:18px 20px 12px;
+  border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--panel);z-index:2;}
+.kt-kick{font-family:var(--mono,monospace);font-size:.6rem;letter-spacing:.24em;text-transform:uppercase;color:var(--accent2,#46dd86);margin-bottom:3px;}
+.kt-title{font-size:1.5rem;letter-spacing:.01em;}
+.kt-x{background:none;border:none;color:var(--dim);font-size:1.5rem;line-height:1;cursor:pointer;padding:2px 6px;border-radius:5px;}
+.kt-x:hover{color:var(--txt);background:#1d2733;}
+.kt-body{padding:16px 20px 22px;}
+.kt-intro{font-size:.95rem;color:var(--txt);margin-bottom:6px;}
+.kt-step{display:flex;gap:14px;margin-top:20px;}
+.kt-n{flex:none;width:26px;height:26px;border-radius:50%;background:#16241c;border:1px solid #2f7a5c;color:#9af0c0;
+  font-family:var(--mono,monospace);font-size:.82rem;font-weight:600;display:flex;align-items:center;justify-content:center;margin-top:2px;}
+.kt-step h3{font-size:1.06rem;margin-bottom:4px;color:var(--ink,#e9eef4);}
+.kt-step p{font-size:.88rem;color:var(--txt);line-height:1.55;margin:5px 0;}
+.kt-cap{font-size:.8rem !important;color:var(--dim) !important;font-style:italic;border-left:2px solid #2f7a5c;padding-left:10px;}
+.kt-demo{background:#0c141b;border:1px solid var(--line);border-radius:7px;padding:11px 12px;margin:9px 0;}
+.kt-tabs{margin-bottom:8px;}
+.kt-tabs button{padding:5px 11px;font-size:.74rem;}
+.kt-legend{display:grid;grid-template-columns:1fr 1fr;gap:3px 14px;}
+.kt-legend span{font-size:.72rem;color:var(--soft,#aeb9c5);display:flex;align-items:center;gap:7px;}
+.kt-legend i{width:9px;height:9px;border-radius:2px;flex:none;}
+.kt-anat{display:grid;grid-template-columns:1fr;gap:10px;}
+.kt-item{margin-bottom:0 !important;cursor:default !important;pointer-events:none;}
+.kt-item.disabled{margin-bottom:0;}
+.kt-calls{list-style:none;display:flex;flex-direction:column;gap:6px;}
+.kt-calls li{font-size:.8rem;color:var(--txt);line-height:1.45;}
+.kt-calls b.g{color:#67e08a;} .kt-calls b.a{color:var(--warn,#e8c364);} .kt-calls b.d{color:#9fb0c6;}
+.kt-done{width:100%;margin-top:24px;padding:12px;font-size:1rem;}
+@media(min-width:480px){ .kt-anat{grid-template-columns:200px 1fr;align-items:start;} }
 </style>
 </head>
 <body>
@@ -444,7 +477,7 @@ h2{font-size:.8rem;letter-spacing:.22em;text-transform:uppercase;color:var(--dim
   <div class="center">
     <div class="mono" style="font-size:.7rem;letter-spacing:.4em;color:var(--dim);">MEDICAL TRAINING AID · EDUCATIONAL USE</div>
     <h1 style="font-size:2.4rem;">MTA<span style="color:var(--dim);">:</span><span style="color:var(--hr);">LIFE</span>LINE</h1>
-    <div class="mono" style="color:#5a6c84;letter-spacing:.3em;font-size:.7rem;margin-top:-2px;">v0.5.2 · FIELD-TEST ALPHA</div>
+    <div class="mono" style="color:#5a6c84;letter-spacing:.3em;font-size:.7rem;margin-top:-2px;">v0.5.3 · FIELD-TEST ALPHA</div>
     <div class="note" style="letter-spacing:.25em;text-transform:uppercase;">Prehospital Trauma Decision Trainer</div>
     <div style="height:8px;"></div>
     <div class="disc"><b>Training aid — not a medical device.</b> LifeLine is an educational simulation for
@@ -513,6 +546,7 @@ h2{font-size:.8rem;letter-spacing:.22em;text-transform:uppercase;color:var(--dim
     <label class="trainbox"><input type="checkbox" id="chkAssess">
       <b>Assessment mode</b> — rated check-ride · credits your mastery profile · a pass on the next locked tier unlocks it. Leave off to drill (practice, with rewind).</label>
     <div style="display:flex;gap:10px;margin-top:8px;">
+      <button id="btnKitTut" class="primary">How to read your kit</button>
       <button id="btnStats">Profile &amp; History</button>
       <button id="btnCodexL">Open the Codex</button>
       <button id="btnExport" title="Download your profile as a file">Export Save</button>
@@ -711,6 +745,77 @@ h2{font-size:.8rem;letter-spacing:.22em;text-transform:uppercase;color:var(--dim
   <div class="toc" id="codexToc"></div>
   <div id="codexBody"></div>
 </div></div>
+
+<!-- v0.5.3: kit tutorial — how to read the main treatment menu -->
+<div id="kitTut" class="kt-overlay" style="display:none;">
+  <div class="kt-card">
+    <div class="kt-head">
+      <div><div class="kt-kick">Tutorial</div><h2 class="kt-title">Reading your kit</h2></div>
+      <button id="kitTutX" class="kt-x" aria-label="Close">&times;</button>
+    </div>
+    <div class="kt-body">
+      <p class="kt-intro">Everything you do to the patient comes from one menu &mdash; <b>your kit</b>, down the right of the screen. Here is how to read it.</p>
+
+      <div class="kt-step"><span class="kt-n">1</span><div>
+        <h3>It is sorted the way you work</h3>
+        <p>The tabs across the top are the <b>MARCH</b> sequence &mdash; the order you treat in. Tap a tab to switch tools.</p>
+        <div class="kt-demo">
+          <div class="bagtabs kt-tabs">
+            <button class="sel" style="border-bottom:2px solid #e2555f;color:#e2555f;">M</button>
+            <button style="border-bottom:2px solid #5fd2e8;">A</button>
+            <button style="border-bottom:2px solid #67e08a;">R</button>
+            <button style="border-bottom:2px solid #e8c364;">C</button>
+            <button style="border-bottom:2px solid #7ab8ff;">H</button>
+            <button style="border-bottom:2px solid #b98df0;">Rx</button>
+          </div>
+          <div class="kt-legend">
+            <span><i style="background:#e2555f"></i>Massive hemorrhage</span>
+            <span><i style="background:#5fd2e8"></i>Airway</span>
+            <span><i style="background:#67e08a"></i>Respiration</span>
+            <span><i style="background:#e8c364"></i>Circulation</span>
+            <span><i style="background:#7ab8ff"></i>Hypothermia</span>
+            <span><i style="background:#b98df0"></i>Rx &mdash; medications</span>
+          </div>
+        </div>
+        <p class="kt-cap">Work top to bottom. Stop the bleeding before you reach for anything else &mdash; that is what the order is for.</p>
+      </div></div>
+
+      <div class="kt-step"><span class="kt-n">2</span><div>
+        <h3>What a tool tells you</h3>
+        <p>Each tool is one card. Four things to read on it:</p>
+        <div class="kt-demo kt-anat">
+          <div class="bagitem kt-item">
+            <div class="nm"><span>Tourniquet</span><span class="ct">&times;2</span></div>
+            <div class="ds">Stops a limb arterial bleed cold. First thing, not last.</div>
+          </div>
+          <ul class="kt-calls">
+            <li><b class="g">⋮⋮ handle</b> &mdash; grab here to drag the tool onto a specific wound.</li>
+            <li><b class="g">Name</b> &mdash; the tool itself.</li>
+            <li><b class="a">&times;2 count</b> &mdash; how many you have left. The bag is the bag; when it is gone, it is gone.</li>
+            <li><b class="d">Description</b> &mdash; what it does, in one line.</li>
+          </ul>
+        </div>
+        <div class="bagitem kt-item disabled" style="margin-top:4px;">
+          <div class="nm"><span>Chest seal</span><span class="ct">&times;0</span></div>
+          <div class="ds">Seals a sucking chest wound.</div>
+        </div>
+        <p class="kt-cap"><b>Greyed out</b> means you are out of that item, or it is not in this tier's kit. You cannot use what you do not have.</p>
+      </div></div>
+
+      <div class="kt-step"><span class="kt-n">3</span><div>
+        <h3>Two ways to use one</h3>
+        <p><b>Tap</b> a tool and it goes to the wound that most needs it &mdash; fastest when there is an obvious problem. Or <b>drag</b> it by the handle onto a specific spot on the body to choose where it goes, which matters when there is more than one wound.</p>
+      </div></div>
+
+      <div class="kt-step"><span class="kt-n">4</span><div>
+        <h3>Two things that trip up first-timers</h3>
+        <p>The kit <b>changes with the patient</b> &mdash; a tool only appears when it could be relevant, so the menu is never longer than it needs to be. And your <b>assessment tools</b> (check a pulse, put on the monitor, the pulse-ox, a thermometer) live in their own place: they tell you <i>what is wrong</i>; the kit <i>fixes it</i>.</p>
+      </div></div>
+
+      <button id="kitTutDone" class="primary kt-done">Got it &mdash; let me work</button>
+    </div>
+  </div>
+</div>
 
 <script>
 "use strict";
@@ -1958,6 +2063,8 @@ const CODEX=[
    '<p><b>Cold fluid now chills a small body harder.</b> Infusion heat loss scales with patient mass, so an adult-sized bolus is a far larger thermal insult to a child \u2014 another reason adult volumes do not belong in pediatric patients.</p>'+
    '<p><b>Fixes.</b> Re-securing a peeled chest seal when out of fresh ones no longer throws a false \u201cout of supplies\u201d message.</p>'+
    '<p class="cite">A second outside bug report was audited against the code. Its headline claims \u2014 a broken triage matrix, \u201cghost-hand\u201d snapshot corruption on rewind, dead rendering code \u2014 did not hold up: the snapshot system already deep-clones and frees mid-action hands, and the triage grading was already correct. Where the report found something real (mass-independent cooling, a spurious seal toast), it was fixed. Its larger proposals \u2014 whole-blood citrate toxicity, RSI, flail chest, crush syndrome \u2014 are good ideas held for their own focused builds rather than rushed in.</p>'},
+ {id:'whatsnew053',t:'v0.5.3 — what changed',b:'<p><b>A starting tutorial: "How to read your kit."</b> First-time players now get a short, skippable walkthrough of the main treatment menu \u2014 the one place every action comes from. It explains that the tabs are the MARCH sequence (the order you treat in), how to read a tool card (its name, the count of how many you have left, the one-line description, and what a greyed-out item means), and the two ways to use one: tap to send it to the wound that needs it most, or drag it onto a specific spot on the body. It opens once on a fresh profile and is always available from the lobby under <b>How to read your kit</b>.</p>'+
+   '<p class="cite">No engine or physiology changes in this build \u2014 onboarding only. The full regression and adversarial test suites were re-run and remain clean.</p>'},
 ];
 let codexOpen=false, codexPausedSim=false;
 function renderCodex(focus){
@@ -2525,7 +2632,7 @@ function buildSessionRecord(p){
   const errs = p.seqErrors.length? p.seqErrors.map(e=>'    - '+e.msg.split('—')[0].split('.')[0].trim()).join('\n') : '    (none)';
   const L=[];
   L.push('MTA: LifeLine — Session Record');
-  L.push('Build v0.5.2 (field-test alpha) · training simulation, not a clinical record');
+  L.push('Build v0.5.3 (field-test alpha) · training simulation, not a clinical record');
   L.push('────────────────────────────────────');
   L.push('Date/time      : '+stamp);
   L.push('Operator/cohort: '+(META.opId||'(not set)'));
@@ -3142,6 +3249,14 @@ function fallbackCopy(txt){ try{ const ta=document.createElement('textarea'); ta
   ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select();
   document.execCommand('copy'); ta.remove(); }catch(e){} }
 $('btnCodexL').onclick=()=>{ sfx.ui(); openCodex(); };
+// v0.5.3: kit tutorial
+function openKitTutorial(){ const o=$('kitTut'); if(o) o.style.display='flex'; }
+function closeKitTutorial(){ const o=$('kitTut'); if(o) o.style.display='none';
+  if(typeof META==='object' && META){ META.tutSeen=true; try{ metaSave(); }catch(e){} } }
+if($('btnKitTut')) $('btnKitTut').onclick=()=>{ sfx.ui(); openKitTutorial(); };
+if($('kitTutX')) $('kitTutX').onclick=()=>{ sfx.ui(); closeKitTutorial(); };
+if($('kitTutDone')) $('kitTutDone').onclick=()=>{ sfx.ui(); closeKitTutorial(); };
+if($('kitTut')) $('kitTut').addEventListener('click',e=>{ if(e.target===$('kitTut')) closeKitTutorial(); });
 $('btnCodexG').onclick=()=>{ sfx.ui(); openCodex(); };
 $('btnCodexX').onclick=()=>{ sfx.ui(); closeCodex(); };
 $('btnExport').onclick=()=>{ sfx.ui(); downloadProfile(); };
@@ -3211,6 +3326,10 @@ function frame(now){
   await metaLoad();
   if($('opId') && META.opId) $('opId').value=META.opId;
   renderLobby();
+  // v0.5.3: first-time players get the kit tutorial once; it's always available from the lobby afterward
+  if(typeof META==='object' && META && !META.tutSeen && (!META.history || META.history.length===0)){
+    setTimeout(()=>{ try{ openKitTutorial(); }catch(e){} }, 450);
+  }
   requestAnimationFrame(frame);
 })();
 
