@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MTA: LifeLine v0.5.3 — Prehospital Trauma Decision Trainer</title>
+<title>MTA: LifeLine v0.5.4 — Prehospital Trauma Decision Trainer</title>
 <style>
 :root{
   /* clinical slate + monitor color coding (Philips convention) */
@@ -468,16 +468,101 @@ h2{font-size:.8rem;letter-spacing:.22em;text-transform:uppercase;color:var(--dim
 .kt-calls b.g{color:#67e08a;} .kt-calls b.a{color:var(--warn,#e8c364);} .kt-calls b.d{color:#9fb0c6;}
 .kt-done{width:100%;margin-top:24px;padding:12px;font-size:1rem;}
 @media(min-width:480px){ .kt-anat{grid-template-columns:200px 1fr;align-items:start;} }
+/* ---- v0.5.3.1: in-game HUD guide (spotlight tour) ---- */
+#hudGuide{position:fixed;inset:0;z-index:320;}
+#hgSpot{position:fixed;border:2px solid #46dd86;border-radius:7px;
+  box-shadow:0 0 0 9999px rgba(4,8,12,.76), 0 0 14px rgba(70,221,134,.45);
+  pointer-events:none;transition:top .2s,left .2s,width .2s,height .2s;}
+#hgCard{position:fixed;left:50%;transform:translateX(-50%);width:min(380px,calc(100vw - 28px));
+  background:var(--panel);border:1px solid #2f7a5c;border-radius:10px;padding:15px 17px;
+  box-shadow:0 18px 50px rgba(0,0,0,.55);}
+.hg-kick{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono,monospace);
+  font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);margin-bottom:5px;}
+.hg-kick #hgName{color:#46dd86;}
+#hgTitle{font-size:1.12rem;margin-bottom:4px;color:var(--ink,#e9eef4);}
+#hgBody{font-size:.86rem;color:var(--txt);line-height:1.55;margin-bottom:13px;}
+.hg-nav{display:flex;justify-content:space-between;align-items:center;gap:10px;}
+.hg-nav .hg-rt{display:flex;gap:8px;}
+.hg-nav button{padding:7px 14px;font-size:.82rem;}
+.hg-x{background:none !important;border:none !important;color:var(--dim) !important;padding:7px 6px !important;}
+.hg-x:hover{color:var(--txt) !important;}
+#hgPrev:disabled{opacity:.35;cursor:default;}
+/* ============================================================
+   v0.5.4 — Comfortable (civilian) theme + typed command interface
+   ============================================================ */
+/* Soft, warm, low-contrast palette inspired by Mini Motorways.
+   Applied by default; the lobby "Minimalist look" toggle removes it. */
+body.comfortable{
+  --bg:#efe7d7; --bg2:#e6dcc8; --panel:#faf5ea; --panel2:#f1ead9; --line:#dcd1bc;
+  --txt:#4a4435; --dim:#8c826c;
+  --bad:#df6f6c; --warn:#d6a049; --ok:#5cae78;
+  --tg:#6abd8b; --ty:#dcbb55; --tr:#d87a6d; --tb:#b4ab97;
+}
+body.comfortable{ background:var(--bg); color:var(--txt); }
+body.comfortable button:hover{ border-color:#c9b48f; background:#efe6d3; }
+body.comfortable button.primary{ background:#dcefe0; border-color:#7cc59b; color:#27613f; }
+body.comfortable button.primary:hover{ background:#cfe8d6; }
+body.comfortable button.danger{ border-color:#d8a3a0; color:#b5564f; }
+body.comfortable #centerstage{ background:radial-gradient(720px 520px at 50% 35%, #fffaf0 0%, var(--bg) 78%); }
+body.comfortable .vit{ border-bottom:1px dashed #d8cdb6; }
+body.comfortable .mono{ color:inherit; }
+/* softer corners everywhere in comfortable mode */
+body.comfortable button,
+body.comfortable .bagitem, body.comfortable .optcard, body.comfortable .trainbox,
+body.comfortable #leftpanel, body.comfortable #rightpanel, body.comfortable #centerstage,
+body.comfortable #topbar, body.comfortable #bottombar, body.comfortable #evacbox,
+body.comfortable .tagchip{ border-radius:12px; }
+body.comfortable #typeInput, body.comfortable .tp-chip{ border-radius:12px; }
+body.comfortable .tp-chip{ border-radius:999px; }
+
+/* ---- right-panel input-mode toggle ---- */
+.rp-modetoggle{display:flex;margin-bottom:9px;border:1px solid var(--line);border-radius:10px;overflow:hidden;}
+.rp-modetoggle button{flex:1;border:none;border-radius:0;padding:8px 6px;font-size:.76rem;letter-spacing:.03em;
+  background:transparent;color:var(--dim);}
+.rp-modetoggle button:hover{background:var(--panel2);}
+.rp-modetoggle button.on{background:var(--panel2);color:var(--txt);font-weight:600;box-shadow:inset 0 -2px 0 var(--ok);}
+
+/* ---- typed command interface ---- */
+#typePanel{display:none;flex-direction:column;gap:9px;flex:1;min-height:0;}
+.tp-prompt{font-size:.84rem;color:var(--txt);margin-bottom:1px;}
+.tp-inwrap{position:relative;}
+#typeInput{width:100%;padding:12px 13px;border-radius:10px;border:1px solid var(--line);
+  background:var(--panel2);color:var(--txt);font-size:.96rem;font-family:inherit;}
+#typeInput::placeholder{color:var(--dim);}
+#typeInput:focus{outline:none;border-color:var(--ok);box-shadow:0 0 0 3px rgba(92,174,120,.22);}
+#typeFeedback{font-size:.8rem;color:var(--warn);min-height:1em;line-height:1.4;}
+.tp-sugghead{font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin-top:2px;}
+#typeSugg{display:flex;flex-wrap:wrap;gap:7px;overflow-y:auto;}
+.tp-chip{display:inline-flex;align-items:center;padding:8px 12px;border-radius:999px;border:1px solid var(--line);
+  background:var(--panel2);color:var(--txt);font-size:.82rem;cursor:pointer;transition:all .12s;text-align:left;}
+.tp-chip:hover{border-color:var(--ok);background:var(--panel);}
+.tp-chip .k{color:var(--dim);font-size:.72rem;margin-left:7px;}
+.tp-help{font-size:.74rem;color:var(--dim);line-height:1.55;margin-top:auto;padding-top:6px;border-top:1px solid var(--line);}
+.tp-help b{color:var(--txt);}
+
+/* ---- civilian lobby framing ---- */
+.civ-intro{border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:14px 16px;margin-bottom:14px;}
+.civ-intro h3{font-size:1.05rem;letter-spacing:.01em;text-transform:none;color:var(--txt);margin-bottom:4px;}
+.civ-intro p{font-size:.88rem;color:var(--dim);line-height:1.55;margin:0;}
+details.adv{border:1px solid var(--line);border-radius:10px;background:var(--bg2);margin-top:10px;}
+details.adv>summary{cursor:pointer;padding:10px 14px;font-size:.78rem;letter-spacing:.04em;color:var(--dim);
+  list-style:none;user-select:none;}
+details.adv>summary::-webkit-details-marker{display:none;}
+details.adv>summary::before{content:'\25B8 ';color:var(--ok);}
+details.adv[open]>summary::before{content:'\25BE ';}
+details.adv .adv-body{padding:4px 14px 14px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;}
+.theme-toggle-row{display:flex;align-items:center;gap:10px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line);}
+.theme-toggle-row .ttl{font-size:.8rem;color:var(--dim);}
 </style>
 </head>
-<body>
+<body class="comfortable">
 
 <!-- ============ TITLE ============ -->
 <div class="screen on" id="scr-title">
   <div class="center">
     <div class="mono" style="font-size:.7rem;letter-spacing:.4em;color:var(--dim);">MEDICAL TRAINING AID · EDUCATIONAL USE</div>
     <h1 style="font-size:2.4rem;">MTA<span style="color:var(--dim);">:</span><span style="color:var(--hr);">LIFE</span>LINE</h1>
-    <div class="mono" style="color:#5a6c84;letter-spacing:.3em;font-size:.7rem;margin-top:-2px;">v0.5.3 · FIELD-TEST ALPHA</div>
+    <div class="mono" style="color:#5a6c84;letter-spacing:.3em;font-size:.7rem;margin-top:-2px;">v0.5.4 · FIELD-TEST ALPHA</div>
     <div class="note" style="letter-spacing:.25em;text-transform:uppercase;">Prehospital Trauma Decision Trainer</div>
     <div style="height:8px;"></div>
     <div class="disc"><b>Training aid — not a medical device.</b> LifeLine is an educational simulation for
@@ -545,14 +630,26 @@ h2{font-size:.8rem;letter-spacing:.22em;text-transform:uppercase;color:var(--dim
     <div style="height:6px;"></div>
     <label class="trainbox"><input type="checkbox" id="chkAssess">
       <b>Assessment mode</b> — rated check-ride · credits your mastery profile · a pass on the next locked tier unlocks it. Leave off to drill (practice, with rewind).</label>
-    <div style="display:flex;gap:10px;margin-top:8px;">
+    <div style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap;">
       <button id="btnKitTut" class="primary">How to read your kit</button>
       <button id="btnStats">Profile &amp; History</button>
       <button id="btnCodexL">Open the Codex</button>
-      <button id="btnExport" title="Download your profile as a file">Export Save</button>
-      <button id="btnImport" title="Load a previously exported profile">Import Save</button>
-      <button id="btnWipe" class="danger" title="Erase your mastery profile, run history, campaign progress and tier unlocks">Reset Everything</button>
-      <input type="file" id="fileImport" accept=".json,application/json" style="display:none;">
+    </div>
+    <details class="adv">
+      <summary>Advanced &amp; instructor options</summary>
+      <div class="adv-body">
+        <button id="btnExport" title="Download your profile as a file">Export Save</button>
+        <button id="btnImport" title="Load a previously exported profile">Import Save</button>
+        <button id="btnWipe" class="danger" title="Erase your mastery profile, run history, campaign progress and tier unlocks">Reset Everything</button>
+        <input type="file" id="fileImport" accept=".json,application/json" style="display:none;">
+      </div>
+    </details>
+    <div class="theme-toggle-row">
+      <span class="ttl">Look:</span>
+      <div class="rp-modetoggle" style="max-width:280px;flex:1;margin:0;">
+        <button id="themeComf">Comfortable</button>
+        <button id="themeMin">Minimalist</button>
+      </div>
     </div>
     <div class="note" id="saveNote" style="margin-top:4px;"></div>
   </div>
@@ -567,6 +664,7 @@ h2{font-size:.8rem;letter-spacing:.22em;text-transform:uppercase;color:var(--dim
       <span class="note" id="tb-moi"></span>
       <span id="tb-time" class="mono">00:00</span>
       <div id="tb-btns">
+        <button id="btnGuide" title="What everything on this screen means">? Guide</button>
         <button id="btnCodexG">Codex</button>
         <button id="btnPause">Pause</button>
         <button class="danger" id="btnQuit">End Scenario</button>
@@ -591,9 +689,21 @@ h2{font-size:.8rem;letter-spacing:.22em;text-transform:uppercase;color:var(--dim
       <div id="toasts"></div>
     </div>
     <div id="rightpanel">
-      <h2>Med-Bag <span class="note" id="certlbl" style="float:right;text-transform:none;letter-spacing:0;"></span></h2>
+      <h2><span id="rpTitleTxt">Treatment</span> <span class="note" id="certlbl" style="float:right;text-transform:none;letter-spacing:0;"></span></h2>
+      <div class="rp-modetoggle" id="rpModeToggle">
+        <button data-mode="type" id="rpmType">&#9000; Type</button>
+        <button data-mode="tap" id="rpmTap">&#9776; Menu</button>
+      </div>
       <div class="bagtabs" id="bagtabs"></div>
       <div id="baglist" style="flex:1;overflow-y:auto;"></div>
+      <div id="typePanel">
+        <div class="tp-prompt">What do you want to do?</div>
+        <div class="tp-inwrap"><input id="typeInput" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="e.g. apply a tourniquet, or check breathing"></div>
+        <div id="typeFeedback"></div>
+        <div class="tp-sugghead" id="tpSuggHead">Try one of these</div>
+        <div id="typeSugg"></div>
+        <div class="tp-help">Say it in plain words, or tap a suggestion. You can name a place too &mdash; <b>&ldquo;tourniquet on the left leg.&rdquo;</b></div>
+      </div>
     </div>
     <div id="bottombar">
       <div id="logbox"></div>
@@ -817,6 +927,23 @@ h2{font-size:.8rem;letter-spacing:.22em;text-transform:uppercase;color:var(--dim
   </div>
 </div>
 
+<!-- v0.5.3.1: in-game HUD guide — spotlights every region of the treatment screen -->
+<div id="hudGuide" style="display:none;">
+  <div id="hgSpot"></div>
+  <div id="hgCard">
+    <div class="hg-kick"><span id="hgStep">1 / 11</span><span id="hgName">Field guide</span></div>
+    <h3 id="hgTitle"></h3>
+    <p id="hgBody"></p>
+    <div class="hg-nav">
+      <button id="hgClose" class="hg-x">Skip</button>
+      <div class="hg-rt">
+        <button id="hgPrev">Back</button>
+        <button id="hgNext" class="primary">Next</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 "use strict";
 /* ============================================================
@@ -976,7 +1103,7 @@ function drillRecommendation(){
   return {pick,reason:pick.raw===0?'untested':'weakest'};
 }
 
-let META={unlocked:1, records:{}, mastery:blankMastery(), history:[], campaign:{next:1, done:{}}, checkrides:{}, opId:''};
+let META={unlocked:1, records:{}, mastery:blankMastery(), history:[], campaign:{next:1, done:{}}, checkrides:{}, opId:'', theme:'comfortable', inputMode:'type'};
 let storageOK=false;
 async function metaLoad(){ try{ if(window.storage&&window.storage.get){
   const r=await window.storage.get('mta_save'); if(r&&r.value){ const d=JSON.parse(r.value);
@@ -2065,6 +2192,14 @@ const CODEX=[
    '<p class="cite">A second outside bug report was audited against the code. Its headline claims \u2014 a broken triage matrix, \u201cghost-hand\u201d snapshot corruption on rewind, dead rendering code \u2014 did not hold up: the snapshot system already deep-clones and frees mid-action hands, and the triage grading was already correct. Where the report found something real (mass-independent cooling, a spurious seal toast), it was fixed. Its larger proposals \u2014 whole-blood citrate toxicity, RSI, flail chest, crush syndrome \u2014 are good ideas held for their own focused builds rather than rushed in.</p>'},
  {id:'whatsnew053',t:'v0.5.3 — what changed',b:'<p><b>A starting tutorial: "How to read your kit."</b> First-time players now get a short, skippable walkthrough of the main treatment menu \u2014 the one place every action comes from. It explains that the tabs are the MARCH sequence (the order you treat in), how to read a tool card (its name, the count of how many you have left, the one-line description, and what a greyed-out item means), and the two ways to use one: tap to send it to the wound that needs it most, or drag it onto a specific spot on the body. It opens once on a fresh profile and is always available from the lobby under <b>How to read your kit</b>.</p>'+
    '<p class="cite">No engine or physiology changes in this build \u2014 onboarding only. The full regression and adversarial test suites were re-run and remain clean.</p>'},
+ {id:'whatsnew0531',t:'v0.5.3.1 — what changed',b:'<p><b>An in-game field guide to the whole treatment screen.</b> The kit tutorial taught the Med-Bag; this goes further. A new <b>? Guide</b> button in the top bar opens a guided tour that spotlights every region of the screen in place and explains what each one shows \u2014 the scenario header, the monitor and its ECG, the vital signs, the diagnostics, the patient body, the acuity read-out, your hands, the Med-Bag, the action bar, the handoff criteria, and the evac button. Eleven stops, one at a time, with the rest of the screen dimmed so you know exactly what you are looking at.</p>'+
+   '<p>It <b>pauses the scenario</b> while it is open and resumes where you left off, and it skips any panel that is hidden by your difficulty options (so Hardcore players are not shown read-outs they chose to do without). It opens once automatically the first time you reach the treatment screen, and is always one tap away from the top bar afterward.</p>'+
+   '<p class="cite">Still onboarding only \u2014 no change to the engine, the physiology, or scoring. Regression (baseline, pediatric, textbook audit) and the 400-run adversarial archetype sweep were re-run and remain clean.</p>'},
+ {id:'whatsnew054',t:'v0.5.4 — a gentler way in',b:'<p>Field-test feedback was blunt and fair: the hub read like code, and a civilian does not think in MARCH or know which tool to reach for. This build is the first answer to that \u2014 a softer on-ramp that leaves the professional sim underneath untouched.</p>'+
+   '<p><b>Type what you would do, in plain words.</b> A new <b>Type</b> input sits where the kit menu was. Write \u201capply a tourniquet on the left leg\u201d, \u201ccheck breathing\u201d, or \u201ccall for help\u201d and it drives the same engine the menu does \u2014 naming a place (\u201cleft leg\u201d, \u201cright chest\u201d) targets it, the way dragging would. Suggestion chips show common actions when the box is empty and filter as you type, so you are never staring at a blank line wondering what is possible. When you switch to typing, the <b>MARCH tab bar folds away</b> and the input takes its place; a <b>Type / Menu</b> toggle swaps back any time.</p>'+
+   '<p><b>A comfortable look.</b> The default skin is now warm and soft-edged, easier on the eye than the clinical telemetry palette. Prefer the original? A <b>Minimalist</b> toggle at the bottom of the lobby restores the dark professional look, and your choice is remembered.</p>'+
+   '<p><b>A calmer hub.</b> Save-management and instructor controls are tucked under an <i>Advanced &amp; instructor options</i> fold, so the first thing you see is how to start and how to learn.</p>'+
+   '<p class="cite">The physiology engine, scoring, and pathologies are unchanged. The typed parser routes to the same actions as the menu; the full regression and 400-run adversarial suites were re-run and remain clean. Next on the roadmap: a civilian Stop-the-Bleed framing of the kit with a bystander-scope toolset, and a guided first case.</p>'},
 ];
 let codexOpen=false, codexPausedSim=false;
 function renderCodex(focus){
@@ -2318,6 +2453,7 @@ function renderBag(){
     bl.appendChild(d);
   });
   $('certlbl').textContent=S.T.cert;
+  if(typeof applyInputMode==='function') applyInputMode();
 }
 function renderHands(){
   $('handsbox').innerHTML='HANDS: '+S.hands.map(h=>'<span class="hand'+(h?' busy':'')+'">'+(h||'free')+'</span>').join('');
@@ -2632,7 +2768,7 @@ function buildSessionRecord(p){
   const errs = p.seqErrors.length? p.seqErrors.map(e=>'    - '+e.msg.split('—')[0].split('.')[0].trim()).join('\n') : '    (none)';
   const L=[];
   L.push('MTA: LifeLine — Session Record');
-  L.push('Build v0.5.3 (field-test alpha) · training simulation, not a clinical record');
+  L.push('Build v0.5.4 (field-test alpha) · training simulation, not a clinical record');
   L.push('────────────────────────────────────');
   L.push('Date/time      : '+stamp);
   L.push('Operator/cohort: '+(META.opId||'(not set)'));
@@ -2745,6 +2881,10 @@ function startGame(tier, cfg, opts){
   $('logbox').innerHTML='';
   buildBody(); wireBody();
   phase='game'; show('scr-game');
+  // v0.5.3.1: first time a player reaches the treatment screen, walk them through it once
+  if(typeof META==='object' && META && !META.hudSeen){
+    setTimeout(()=>{ try{ if(phase==='game' && S && !S.over) openHudGuide(); }catch(e){} }, 650);
+  }
   if(!S.blind) flashMOI(S.tpl.moi);
   if(S.peds) logEv('act','Pediatric patient — '+S.ageBand+', about '+S.age+(S.age===1?' year':' years')+' old (~'+S.weight+' kg). Their numbers are not adult numbers; their reserve is small.','warn');
   if(S.lesson) logEv('act','LESSON '+S.lesson.n+' \u2014 '+S.lesson.title+'. Goals are listed in the briefing and graded on your AAR.','good');
@@ -3257,6 +3397,51 @@ if($('btnKitTut')) $('btnKitTut').onclick=()=>{ sfx.ui(); openKitTutorial(); };
 if($('kitTutX')) $('kitTutX').onclick=()=>{ sfx.ui(); closeKitTutorial(); };
 if($('kitTutDone')) $('kitTutDone').onclick=()=>{ sfx.ui(); closeKitTutorial(); };
 if($('kitTut')) $('kitTut').addEventListener('click',e=>{ if(e.target===$('kitTut')) closeKitTutorial(); });
+
+// v0.5.3.1: in-game HUD guide — spotlights every region of the treatment screen
+const HG_STEPS=[
+  {el:'topbar',    t:'Scenario header', d:'The patient\u2019s <b>triage colour</b> and the <b>mechanism of injury</b> (how they were hurt), the running <b>scene clock</b>, and your controls: Codex, Pause, and End.'},
+  {el:'monitorCv', t:'The monitor',     d:'A live <b>ECG rhythm</b> strip. Its shape and rate are your at-a-glance read on the heart \u2014 the same trace a real monitor would show.'},
+  {el:'vitboard',  t:'Vital signs',     d:'Heart rate, blood pressure, oxygen saturation, respiratory rate, temperature. <b>Read the trend, not the snapshot:</b> a rising heart rate while the pressure still holds is a patient compensating \u2014 until, suddenly, they can\u2019t.'},
+  {el:'diagbtns',  t:'Diagnostics',     d:'Assessment tools \u2014 they don\u2019t treat, they <b>reveal</b>. Check a pulse, attach the monitor leads, the pulse-ox, a thermometer, run a head-to-toe exam. This is how you find out what is wrong.'},
+  {el:'bodywrap',  t:'The patient',     d:'Wounds and findings appear on the body. <b>Tap a region</b> to assess it; <b>drag a tool</b> from your kit onto a wound to treat exactly there.'},
+  {el:'acuity',    t:'The read-out',    d:'How sick they are right now, in plain words, with a one-line status beneath. <i>Hidden in Hardcore</i> \u2014 then you read the monitor yourself.'},
+  {el:'handsbox',  t:'Your hands',      d:'Some actions need one hand, some need two. Holding pressure or bagging <b>occupies a hand</b> until you let go \u2014 this shows what is currently tied up.'},
+  {el:'rightpanel',t:'The Med-Bag',     d:'Your treatments, sorted by <b>MARCH</b>. Tap a tool to use it, or drag it onto a wound to target. The <b>How to read your kit</b> tutorial covers this menu in detail.'},
+  {el:'channelbox',t:'The action bar',  d:'A timed action in progress \u2014 packing a wound, starting a line. <b>Tap anywhere to abort</b> it if you change your mind.'},
+  {el:'critlist',  t:'Handoff criteria',d:'The <b>MARCH checklist</b> for a patient ready to travel \u2014 met items turn green. Shown as prompts, or hidden, depending on the options you picked.'},
+  {el:'btnEvac',   t:'Call for evac',   d:'When they are stable enough to move, request transport. The goal was never to cure them here \u2014 only to <b>keep them alive to handoff</b>.'},
+];
+let hgList=[], hgIdx=0, hgPausedSim=false;
+function hgVisible(id){ const e=$(id); if(!e) return false; const r=e.getBoundingClientRect(); return r.width>2 && r.height>2; }
+function openHudGuide(){
+  if(phase!=='game' || !S) return;                    // only meaningful on the treatment screen
+  hgList=HG_STEPS.filter(s=>hgVisible(s.el)); if(!hgList.length) return;
+  if(S && !S.paused && !S.over){ S.paused=true; hgPausedSim=true; }
+  hgIdx=0; $('hudGuide').style.display='block'; renderHudStep();
+}
+function closeHudGuide(){ $('hudGuide').style.display='none';
+  if(hgPausedSim && S){ S.paused=false; hgPausedSim=false; }
+  if(typeof META==='object' && META){ META.hudSeen=true; try{ metaSave(); }catch(e){} } }
+function renderHudStep(){
+  if(hgIdx<0) hgIdx=0; if(hgIdx>=hgList.length){ closeHudGuide(); return; }
+  const step=hgList[hgIdx], e=$(step.el); if(!e){ hgIdx++; return renderHudStep(); }
+  const r=e.getBoundingClientRect(), pad=6, spot=$('hgSpot');
+  spot.style.top=(r.top-pad)+'px'; spot.style.left=(r.left-pad)+'px';
+  spot.style.width=(r.width+pad*2)+'px'; spot.style.height=(r.height+pad*2)+'px';
+  $('hgStep').textContent=(hgIdx+1)+' / '+hgList.length;
+  $('hgTitle').textContent=step.t; $('hgBody').innerHTML=step.d;
+  $('hgPrev').disabled=(hgIdx===0);
+  $('hgNext').textContent=(hgIdx===hgList.length-1)?'Done':'Next';
+  const card=$('hgCard'), vh=window.innerHeight;
+  if(r.top + r.height/2 < vh*0.52){ card.style.bottom='auto'; card.style.top=Math.min(r.bottom+14, vh-card.offsetHeight-12)+'px'; }
+  else { card.style.top='auto'; card.style.bottom=Math.min(vh-r.top+14, vh-card.offsetHeight-12)+'px'; }
+}
+if($('btnGuide')) $('btnGuide').onclick=()=>{ sfx.ui(); openHudGuide(); };
+if($('hgNext'))  $('hgNext').onclick=()=>{ sfx.ui(); hgIdx++; renderHudStep(); };
+if($('hgPrev'))  $('hgPrev').onclick=()=>{ sfx.ui(); hgIdx--; renderHudStep(); };
+if($('hgClose')) $('hgClose').onclick=()=>{ sfx.ui(); closeHudGuide(); };
+window.addEventListener('resize',()=>{ if($('hudGuide') && $('hudGuide').style.display==='block') renderHudStep(); });
 $('btnCodexG').onclick=()=>{ sfx.ui(); openCodex(); };
 $('btnCodexX').onclick=()=>{ sfx.ui(); closeCodex(); };
 $('btnExport').onclick=()=>{ sfx.ui(); downloadProfile(); };
@@ -3280,7 +3465,7 @@ $('fileImport').onchange=e=>{ const f=e.target.files&&e.target.files[0]; e.targe
 $('btnWipe').onclick=async()=>{ sfx.ui();
   const ok=await gameConfirm('<b>Reset everything?</b><br><br>Your mastery profile, run history, campaign progress and tier unlocks all go back to zero. Export first if you want a backup.','Reset it all');
   if(!ok) return;
-  META={unlocked:1,records:{},mastery:blankMastery(),history:[],campaign:{next:1,done:{}},checkrides:{}}; metaSave(); renderLobby(); toast('Records wiped. Clean slate.','warnc'); };
+  META={unlocked:1,records:{},mastery:blankMastery(),history:[],campaign:{next:1,done:{}},checkrides:{},theme:(META.theme||'comfortable'),inputMode:(META.inputMode||'type')}; metaSave(); renderLobby(); toast('Records wiped. Clean slate.','warnc'); };
 $('btnPause').onclick=()=>{ if(S&&!S.over) setPause(!S.paused); };
 $('btnResume').onclick=()=>{ setPause(false); };
 $('btnQuit').onclick=()=>{ if(!S||S.over){ phase='lobby'; renderLobby(); show('scr-lobby'); return; }
@@ -3322,8 +3507,147 @@ function frame(now){
   }
   requestAnimationFrame(frame);
 }
+/* ============================================================
+   v0.5.4 — Comfortable theme + typed command interface
+   ============================================================ */
+function applyTheme(){
+  const minimal=(META && META.theme==='minimalist');
+  document.body.classList.toggle('comfortable', !minimal);
+  const a=$('themeComf'), b=$('themeMin');
+  if(a) a.classList.toggle('on',!minimal);
+  if(b) b.classList.toggle('on',minimal);
+}
+function setTheme(t){ if(META){ META.theme=t; try{metaSave();}catch(e){} } applyTheme(); }
+
+function curInputMode(){ return (META && META.inputMode==='tap')?'tap':'type'; }
+function applyInputMode(){
+  const typing=(curInputMode()==='type');
+  const tp=$('typePanel'), bt=$('bagtabs'), bl=$('baglist');
+  if(tp) tp.style.display=typing?'flex':'none';
+  if(bt) bt.style.display=typing?'none':'';          // fold the MARCH bar away while typing
+  if(bl) bl.style.display=typing?'none':'';
+  const t=$('rpTitleTxt'); if(t) t.textContent=typing?'Treatment':'Your kit';
+  const mt=$('rpmType'), mp=$('rpmTap');
+  if(mt) mt.classList.toggle('on',typing);
+  if(mp) mp.classList.toggle('on',!typing);
+  if(typing){ const inp=$('typeInput'), sg=$('typeSugg');
+    if(inp && !inp.value && sg && !sg.children.length) renderSuggestions(''); }   // seed once, never clobber active typing
+}
+function setInputMode(m){ if(META){ META.inputMode=m; try{metaSave();}catch(e){} } applyInputMode();
+  if(m==='type'){ const i=$('typeInput'); if(i) setTimeout(()=>i.focus(),30); } }
+
+/* the parser: plain civilian language -> real engine actions.
+   kind: 'bag' -> applyBagItem · 'diag' -> DIAG.run (via channel) · 'evac' -> callEvac */
+const CMD_SYN=[
+  {kind:'diag',id:'talk',    ph:['talk','speak','ask','say something','are you ok','are you okay','wake them','wake him','wake her','responsive','can you hear me','check responsiveness']},
+  {kind:'diag',id:'pulse',   ph:['pulse','feel for a pulse','check pulse','check the pulse','heartbeat','is there a pulse','check circulation']},
+  {kind:'diag',id:'exam',    ph:['check them over','look them over','examine','head to toe','look for injuries','assess','check the body','search for wounds','find injuries','sweep for injuries']},
+  {kind:'diag',id:'steth',   ph:['check breathing','are they breathing','is he breathing','is she breathing','listen to the chest','listen to breathing','listen to lungs','breath sounds','check the lungs']},
+  {kind:'diag',id:'cuff',    ph:['blood pressure','take blood pressure','bp cuff','check bp','blood pressure cuff']},
+  {kind:'diag',id:'pox',     ph:['pulse ox','oximeter','oxygen level','sats','spo2','oxygen saturation']},
+  {kind:'diag',id:'leads',   ph:['monitor','heart monitor','attach the monitor','put on the leads','the leads','ecg','ekg','rhythm']},
+  {kind:'diag',id:'thermo',  ph:['temperature','check temperature','thermometer','core temp','how cold are they']},
+  {kind:'diag',id:'glu',     ph:['blood sugar','glucose level','glucometer','check sugar','check their sugar']},
+  {kind:'bag', id:'pressure',ph:['apply pressure','press on the wound','hold pressure','push on the wound','press the wound','direct pressure','stop the bleeding','stop bleeding','control bleeding','control the bleeding','put pressure on it']},
+  {kind:'bag', id:'tq',      ph:['tourniquet','apply a tourniquet','apply tourniquet','put on a tourniquet','tie off the leg','tie off the arm','cat tourniquet','combat tourniquet']},
+  {kind:'bag', id:'tqTight', ph:['tighten the tourniquet','re-tighten','retighten','crank the tourniquet','tighten tourniquet']},
+  {kind:'bag', id:'hemo',    ph:['pack the wound','wound packing','stuff the wound','hemostatic','pack the bleed','gauze pack','quikclot','pack it']},
+  {kind:'bag', id:'dressing',ph:['bandage','dress the wound','wrap it','pressure dressing','apply a bandage','wrap the wound']},
+  {kind:'bag', id:'shears',  ph:['cut the clothes','cut clothing','expose the wound','cut away clothing','scissors','shears','strip the clothes','cut his shirt','cut her shirt']},
+  {kind:'bag', id:'binder',  ph:['pelvic binder','binder','bind the pelvis','wrap the pelvis']},
+  {kind:'bag', id:'recovery',ph:['recovery position','roll them on their side','roll him','roll her','put on their side','put on his side','roll onto side','on their side','put in recovery']},
+  {kind:'bag', id:'suction', ph:['suction','clear the airway','clear the mouth','suction the airway']},
+  {kind:'bag', id:'opa',     ph:['oral airway','opa','oropharyngeal']},
+  {kind:'bag', id:'npa',     ph:['nasal airway','npa','nasopharyngeal']},
+  {kind:'bag', id:'sealV',   ph:['chest seal','seal the chest','vented seal','cover the chest wound','seal the wound','occlusive dressing']},
+  {kind:'bag', id:'sealU',   ph:['unvented seal','unvented chest seal']},
+  {kind:'bag', id:'decomp',  ph:['needle decompression','decompress','needle the chest','needle thoracostomy','dart the chest']},
+  {kind:'bag', id:'nrb',     ph:['oxygen','give oxygen','non-rebreather','oxygen mask','high flow oxygen']},
+  {kind:'bag', id:'bvm',     ph:['bag them','bvm','bag valve mask','breathe for them','ventilate','assist breathing','bag the patient']},
+  {kind:'bag', id:'iv',      ph:['start a line','iv access','put in a line','intravenous','cannula','iv line']},
+  {kind:'bag', id:'io',      ph:['intraosseous','bone drill','ez-io','io drill']},
+  {kind:'bag', id:'saline',  ph:['saline','give fluids','iv fluids','crystalloid','fluid bolus']},
+  {kind:'bag', id:'blood',   ph:['give blood','whole blood','transfusion','transfuse','blood unit']},
+  {kind:'bag', id:'hts',     ph:['hypertonic saline','hypertonic','3% saline','3 percent saline']},
+  {kind:'bag', id:'txa',     ph:['txa','tranexamic acid','tranexamic']},
+  {kind:'bag', id:'ketamine',ph:['ketamine','pain relief','pain control','analgesia','something for the pain']},
+  {kind:'bag', id:'morphine',ph:['morphine']},
+  {kind:'bag', id:'naloxone',ph:['narcan','naloxone','reverse the opioid','reverse opioids','opioid reversal']},
+  {kind:'bag', id:'epi',     ph:['epinephrine','adrenaline','arrest epi']},
+  {kind:'bag', id:'aspirin', ph:['aspirin']},
+  {kind:'bag', id:'nitro',   ph:['nitroglycerin','nitro','gtn']},
+  {kind:'bag', id:'glucose', ph:['oral glucose','give sugar','glucose gel']},
+  {kind:'bag', id:'blanket', ph:['blanket','keep them warm','keep warm','cover them','warm them','prevent heat loss','wrap them up']},
+  {kind:'bag', id:'heat',    ph:['heat packs','heat pack','warm packs','active warming']},
+  {kind:'bag', id:'splint',  ph:['splint','splint the leg','splint the arm','immobilize','sam splint']},
+  {kind:'bag', id:'cpr',     ph:['cpr','compressions','chest compressions','start cpr','do cpr','pump the chest']},
+  {kind:'bag', id:'aed',     ph:['aed','defibrillator','defib','shock them','use the aed']},
+  {kind:'evac',id:'evac',    ph:['call 911','call for help','call an ambulance','call ems','get help','request evac','call evac','transport','call medics','call 999','call 112']},
+];
+const REGION_PARTS={leg:['legL','legR'],legs:['legL','legR'],thigh:['legL','legR'],arm:['armL','armR'],
+  shoulder:['armL','armR'],chest:['chestL','chestR'],head:['head'],neck:['head'],
+  belly:['abd'],stomach:['abd'],abdomen:['abd'],gut:['abd'],pelvis:['pelvis'],hip:['pelvis'],hips:['pelvis'],groin:['pelvis']};
+function parseRegion(q){
+  let side=null; if(/\bleft\b/.test(q)) side='L'; else if(/\bright\b/.test(q)) side='R';
+  for(const part in REGION_PARTS){ if(new RegExp('\\b'+part+'\\b').test(q)){
+    const opts=REGION_PARTS[part];
+    if(opts.length===1) return opts[0];
+    if(side==='L') return opts[0]; if(side==='R') return opts[1];
+    return null;
+  }}
+  return null;
+}
+function matchCommand(raw){
+  const q=' '+String(raw||'').toLowerCase().replace(/[^a-z0-9%\s]/g,' ').replace(/\s+/g,' ').trim()+' ';
+  let best=null, bestLen=0;
+  for(const c of CMD_SYN){ for(const p of c.ph){
+    if(q.indexOf(' '+p+' ')>=0 && p.length>bestLen){ best=c; bestLen=p.length; } } }
+  return best ? {cmd:best, region:parseRegion(q)} : null;
+}
+function execTyped(raw){
+  if(!S||S.over||S.paused) return;
+  const fb=$('typeFeedback'), m=matchCommand(raw);
+  if(!m){ if(fb) fb.textContent='Not sure what that means \u2014 tap a suggestion, or try words like \u201ctourniquet\u201d, \u201ccheck breathing\u201d, or \u201ccall for help.\u201d';
+    renderSuggestions(raw); return; }
+  if(fb) fb.textContent='';
+  const {cmd,region}=m;
+  if(cmd.kind==='evac'){ if(!S.over&&!S.paused){ sfx.ui(); callEvac(); renderCrit(); } }
+  else if(cmd.kind==='diag'){ const d=DIAG.find(x=>x.id===cmd.id); if(d){ sfx.ui();
+      if(d.secs>0) startChannel(d.nm,d.secs,d.hands,()=>{ d.run(); renderAll(); }); else { d.run(); renderAll(); } } }
+  else { const it=BAG.find(x=>x.id===cmd.id); if(it) applyBagItem(it, region); }
+  const inp=$('typeInput'); if(inp) inp.value='';
+  renderSuggestions('');
+}
+const STARTERS=['talk','exam','pressure','tq','steth','recovery','nrb','blanket','evac'];
+function suggLabel(c){
+  if(c.kind==='evac') return 'Call for help';
+  if(c.kind==='diag'){ const d=DIAG.find(x=>x.id===c.id); return d?d.nm:c.id; }
+  const it=BAG.find(x=>x.id===c.id); return it?it.nm.replace(/\s*\u2014.*$/,''):c.id;
+}
+function renderSuggestions(q){
+  const box=$('typeSugg'); if(!box) return; box.innerHTML=''; q=String(q||'').toLowerCase().trim();
+  const head=$('tpSuggHead'); let list;
+  if(!q){ if(head) head.textContent='Common first aid'; list=STARTERS.map(id=>CMD_SYN.find(c=>c.id===id)).filter(Boolean); }
+  else { if(head) head.textContent='Matches';
+    list=CMD_SYN.filter(c=> c.ph.some(p=>p.indexOf(q)>=0||q.indexOf(p)>=0) || suggLabel(c).toLowerCase().indexOf(q)>=0 ); }
+  if(!list.length){ const d=document.createElement('div'); d.className='tp-help'; d.style.borderTop='none'; d.style.marginTop='0';
+    d.textContent='No match yet \u2014 keep typing, or clear the box to see common actions.'; box.appendChild(d); return; }
+  list.slice(0,8).forEach(c=>{ const b=document.createElement('button'); b.className='tp-chip';
+    b.textContent=suggLabel(c); b.onclick=()=>{ const inp=$('typeInput'); if(inp) inp.value=''; execTyped(c.ph[0]); };
+    box.appendChild(b); });
+}
+if($('rpmType')) $('rpmType').onclick=()=>{ sfx.ui(); setInputMode('type'); };
+if($('rpmTap'))  $('rpmTap').onclick=()=>{ sfx.ui(); setInputMode('tap'); renderBag(); };
+if($('typeInput')){
+  $('typeInput').addEventListener('input',e=>renderSuggestions(e.target.value));
+  $('typeInput').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); const v=e.target.value.trim(); if(v) execTyped(v); } });
+}
+if($('themeComf')) $('themeComf').onclick=()=>{ sfx.ui(); setTheme('comfortable'); };
+if($('themeMin'))  $('themeMin').onclick=()=>{ sfx.ui(); setTheme('minimalist'); };
+
 (async function boot(){
   await metaLoad();
+  applyTheme();
   if($('opId') && META.opId) $('opId').value=META.opId;
   renderLobby();
   // v0.5.3: first-time players get the kit tutorial once; it's always available from the lobby afterward
