@@ -2,19 +2,29 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MTA: LifeLine v0.5.4 — Prehospital Trauma Decision Trainer</title>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline' 'self'; style-src 'unsafe-inline' 'self'; img-src 'self' data: blob:; media-src 'self' data: blob:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>MTA: LifeLine v0.5.5.1 — First Aid Response</title>
 <style>
 :root{
-  /* clinical slate + monitor color coding (Philips convention) */
-  --bg:#0c1118; --bg2:#121927; --panel:#151d2c; --panel2:#1b2436; --line:#28344a;
-  --txt:#d7e0ea; --dim:#7a8aa0; --paper:#f1e9d6; --paperink:#2c2418;
+  /* ---- core surface system (5 tokens) — deep slate, Mini-Motorways "night" ---- */
+  --bg:#151a21; --bg2:#10141a; --panel:#1d242d; --panel2:#252d38; --line:#333c48;
+  --txt:#e7ecf2; --dim:#94a1b1; --ink:#f3f6fb;
+  --paper:#f1e9d6; --paperink:#2c2418;
+  --radius:14px; --radius-sm:10px; --radius-lg:20px;
+  --shadow:0 2px 6px rgba(0,0,0,.34), 0 6px 18px rgba(0,0,0,.30);
+  --shadow-sm:0 1px 3px rgba(0,0,0,.30);
+  --bub:#222a36;          /* log/speech bubble fill */
+  /* ---- monitor color coding (kept clinically accurate, Philips convention — never themed) ---- */
   --hr:#67e08a;     /* ECG green */
   --spo2:#5fd2e8;   /* pleth cyan */
   --bp:#ff8d5a;    /* NIBP orange */
   --temp:#e8e2d0;
-  --bad:#ff5d5d; --warn:#ffc24d; --ok:#67e08a;
-  --tg:#3fae62; --ty:#d9b53a; --tr:#cf4444; --tb:#3a3f4a;
+  /* ---- 5 semantic accents (pastel, high-contrast on slate) ---- */
+  --bad:#ef7d76; --warn:#ecc068; --ok:#74c597; --info:#84b6e4; --med:#b89fe0;
+  --tg:#5cb585; --ty:#dcc05a; --tr:#df7068; --tb:#3a424f;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{width:100%;height:100%;background:var(--bg);color:var(--txt);
@@ -98,8 +108,8 @@ h2{font-size:.8rem;letter-spacing:.22em;text-transform:uppercase;color:var(--dim
 .toolbtns button{font-size:.72rem;padding:8px 6px;}
 .toolbtns button.attached{border-color:#2f7a5c;color:#9af0c0;}
 /* med bag */
-.bagtabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px;}
-.bagtabs button{padding:5px 9px;font-size:.7rem;letter-spacing:.08em;}
+.bagtabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
+.bagtabs button{padding:10px 15px;font-size:.82rem;letter-spacing:.06em;min-height:42px;min-width:42px;font-weight:600;}
 .bagtabs button.sel{background:#26426a;border-color:#3f6db0;color:#cfe4ff;}
 .bagitem{border:1px solid var(--line);border-radius:6px;padding:8px 10px;margin-bottom:6px;
   cursor:pointer;background:var(--panel2);transition:all .1s;}
@@ -121,7 +131,7 @@ h2{font-size:.8rem;letter-spacing:.22em;text-transform:uppercase;color:var(--dim
 .hand.busy{border-color:#7a5c2f;color:var(--warn);}
 #channelbox{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);width:330px;display:none;}
 #channelbox.on{display:block;}
-#channelbox .lbl{font-size:.78rem;text-align:center;margin-bottom:5px;color:#cfe4ff;}
+#channelbox .lbl{font-size:.78rem;text-align:center;margin-bottom:5px;color:var(--info);font-weight:600;}
 #channelbox .bar{height:12px;background:#0c1320;border:1px solid var(--line);border-radius:6px;overflow:hidden;}
 #channelbox .bar i{display:block;height:100%;background:linear-gradient(90deg,#2f7a5c,#67e08a);width:0%;}
 #channelbox .cancel{text-align:center;margin-top:5px;font-size:.66rem;color:var(--dim);}
@@ -433,6 +443,8 @@ h2{font-size:.8rem;letter-spacing:.22em;text-transform:uppercase;color:var(--dim
 #game-grid.hc #statusline,
 #game-grid.hc #envline,
 #game-grid.hc #speech,
+#game-grid.hc .bagitem .ds,
+#game-grid.hc .baghint,
 #game-grid.hc #logbox{ display:none !important; }
 #game-grid.hc #bottombar{ grid-template-columns:1fr !important; }
 /* ---- v0.5.3: kit tutorial overlay ---- */
@@ -492,28 +504,74 @@ h2{font-size:.8rem;letter-spacing:.22em;text-transform:uppercase;color:var(--dim
    ============================================================ */
 /* Soft, warm, low-contrast palette inspired by Mini Motorways.
    Applied by default; the lobby "Minimalist look" toggle removes it. */
-body.comfortable{
-  --bg:#efe7d7; --bg2:#e6dcc8; --panel:#faf5ea; --panel2:#f1ead9; --line:#dcd1bc;
-  --txt:#4a4435; --dim:#8c826c;
-  --bad:#df6f6c; --warn:#d6a049; --ok:#5cae78;
-  --tg:#6abd8b; --ty:#dcbb55; --tr:#d87a6d; --tb:#b4ab97;
+body.light{
+  --bg:#f2ece0; --bg2:#e9e0d0; --panel:#fbf7ee; --panel2:#f2ebdc; --line:#d3c6ad;
+  --txt:#2c2820; --dim:#615847; --ink:#241f18;
+  --bad:#c0544c; --warn:#a9781b; --ok:#3f8f63; --info:#3f6e9e; --med:#7d5fb0;
+  --tg:#5aa67c; --ty:#d2b24f; --tr:#d2756a; --tb:#a59a7c;
+  --shadow:0 2px 6px rgba(120,98,60,.10), 0 8px 22px rgba(120,98,60,.12);
+  --shadow-sm:0 1px 3px rgba(120,98,60,.12);
+  --bub:#f4eee1;
 }
-body.comfortable{ background:var(--bg); color:var(--txt); }
-body.comfortable button:hover{ border-color:#c9b48f; background:#efe6d3; }
-body.comfortable button.primary{ background:#dcefe0; border-color:#7cc59b; color:#27613f; }
-body.comfortable button.primary:hover{ background:#cfe8d6; }
-body.comfortable button.danger{ border-color:#d8a3a0; color:#b5564f; }
-body.comfortable #centerstage{ background:radial-gradient(720px 520px at 50% 35%, #fffaf0 0%, var(--bg) 78%); }
-body.comfortable .vit{ border-bottom:1px dashed #d8cdb6; }
-body.comfortable .mono{ color:inherit; }
-/* softer corners everywhere in comfortable mode */
-body.comfortable button,
-body.comfortable .bagitem, body.comfortable .optcard, body.comfortable .trainbox,
-body.comfortable #leftpanel, body.comfortable #rightpanel, body.comfortable #centerstage,
-body.comfortable #topbar, body.comfortable #bottombar, body.comfortable #evacbox,
-body.comfortable .tagchip{ border-radius:12px; }
-body.comfortable #typeInput, body.comfortable .tp-chip{ border-radius:12px; }
-body.comfortable .tp-chip{ border-radius:999px; }
+body.light{ background:var(--bg); color:var(--txt); }
+body.light button:hover{ border-color:#c9b48f; background:#efe6d3; }
+body.light button.primary{ background:#dcefe0; border-color:#7cc59b; color:#27613f; }
+body.light button.primary:hover{ background:#cfe8d6; }
+body.light button.danger{ border-color:#d8a3a0; color:#b5564f; }
+body.light .bagtabs button.sel{ background:#eadfca; border-color:#c9b48f; color:#46413a; }
+body.light .bagitem:hover{ border-color:#c9b48f; }
+body.light #centerstage{ background:radial-gradient(720px 520px at 50% 35%, #fffaf0 0%, var(--bg) 78%); }
+body.light .vit{ border-bottom:1px dashed #d8cdb6; }
+body.light .mono{ color:inherit; }
+body.light .runrow span[style*="5a6c84"],
+body.light .runrow span[style*="8a9ab0"],
+body.light .runrow span[style*="6a7a90"]{ color:var(--dim) !important; }
+
+/* ---- light-theme text legibility: dark-theme accents/grays remapped for cream ---- */
+body.light .lchip{ color:var(--txt); }
+body.light .lchip.done{ color:#2c7a52; }
+body.light .lchip.cur{ color:#946012; }
+body.light .lchip.locked{ opacity:.6; }
+body.light .lchip:hover{ border-color:#c9b48f; }
+body.light .nextlesson{ border-color:#7cc59b; }
+body.light .nextlesson:hover{ background:var(--panel2); }
+body.light .nextlesson .ln{ color:#2c7a52; }
+body.light .hg-kick #hgName{ color:#2c7a52; }
+body.light .cite, body.light p.cite, body.light .note{ color:var(--dim); }
+/* inline dark-theme text colours that land on light surfaces → legible equivalents */
+body.light [style*="#9af0c0"],
+body.light [style*="#bfe6cf"],
+body.light [style*="#9fe6b4"]{ color:#2c7a52 !important; }
+body.light [style*="#ffe2ae"],
+body.light [style*="#f0c59a"],
+body.light [style*="#e8cf9a"]{ color:#946012 !important; }
+body.light [style*="#cfe4ff"],
+body.light [style*="#9fb0c6"],
+body.light [style*="#9fb0c8"],
+body.light [style*="#52647d"],
+body.light [style*="#9aa3ad"]{ color:#3f6e9e !important; }
+body.light [style*="#e6a3c4"]{ color:#9a4f73 !important; }
+body.light .tagchip.b{ color:#2c2820 !important; border-color:#a59a7c; }
+/* secondary/informational text on light surfaces → legible warm dim */
+body.light .tier .lockmsg,
+body.light .vu, body.light .vsub, body.light .acu-si,
+body.light #logbox .t, body.light .apnote, body.light .rdyl,
+body.light .mbar .mv, body.light .msnote, body.light .bclaim,
+body.light .bnote, body.light .drillcard .sub, body.light .mci-empty,
+body.light .opts-sub, body.light .opts-foot,
+body.light .msv, body.light .bval,
+body.light .vit.unread .v{ color:var(--dim) !important; }
+/* the running event log is primary reading → full-strength ink */
+body.light #logbox{ color:var(--txt); }
+/* green "attached/active" accent on a light button face → dark green */
+body.light .toolbtns button.attached{ color:#2c7a52 !important; }
+
+/* ---- rounded + pastel component pass (both modes) ---- */
+button,.bagitem,.optcard,.trainbox,.tagchip,#leftpanel,#rightpanel,#centerstage,
+#topbar,#bottombar,#evacbox,.idrow input,#typeInput,.tp-chip,.civ-intro,details.adv,
+.overlay-card,.modal,#sessionRec textarea,.runrow{ border-radius:var(--radius); }
+.bagtabs button{ border-radius:var(--radius-sm); }
+.tp-chip{ border-radius:999px; }
 
 /* ---- right-panel input-mode toggle ---- */
 .rp-modetoggle{display:flex;margin-bottom:9px;border:1px solid var(--line);border-radius:10px;overflow:hidden;}
@@ -553,17 +611,125 @@ details.adv[open]>summary::before{content:'\25BE ';}
 details.adv .adv-body{padding:4px 14px 14px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;}
 .theme-toggle-row{display:flex;align-items:center;gap:10px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line);}
 .theme-toggle-row .ttl{font-size:.8rem;color:var(--dim);}
+/* ============================================================
+   v0.5.5 — GUI DESIGN OVERHAUL (soft, elevated; shared by Light & Dark)
+   The ECG monitor and the vital read-out tiles stay clinical/dark on purpose.
+   ============================================================ */
+/* panels → soft elevation + hairline separators instead of hard borders */
+#topbar{ border-bottom:none; box-shadow:0 1px 0 var(--line), var(--shadow-sm); position:relative; z-index:20; }
+#bottombar{ border-top:none; box-shadow:0 -1px 0 var(--line), var(--shadow-sm); }
+#leftpanel{ border:none; box-shadow:1px 0 0 var(--line); }
+#rightpanel{ border:none; box-shadow:-1px 0 0 var(--line); }
+
+/* section headings → friendlier; accent pip on the in-game panel titles only */
+h2{ text-transform:none; letter-spacing:.005em; font-size:.92rem; font-weight:700; color:var(--txt); }
+#leftpanel>h2::before,#rightpanel>h2::before,#bottombar>h2::before{ content:''; display:inline-block;
+  width:8px; height:8px; border-radius:3px; background:var(--ok); margin-right:8px; vertical-align:middle; }
+
+/* buttons → chunky rounded, soft shadow, gentle lift */
+button{ border-radius:var(--radius); border:1px solid var(--line); background:var(--panel2); color:var(--txt);
+  font-weight:600; box-shadow:var(--shadow-sm);
+  transition:transform .12s, box-shadow .12s, background .12s, border-color .12s, filter .12s; }
+button:hover{ transform:translateY(-1px); box-shadow:var(--shadow); }
+button:active{ transform:translateY(0); box-shadow:var(--shadow-sm); }
+button.primary{ background:var(--ok); border-color:transparent; color:#0c130e; }
+button.primary:hover{ background:var(--ok); filter:brightness(1.07); }
+body.light button.primary{ background:#2f8159; border-color:transparent; color:#fff; }
+body.light button.primary:hover{ background:#2f8159; filter:brightness(1.06); }
+
+/* MARCH·Rx → one segmented row of 6 equal cells, fitted to the panel width */
+.bagtabs{ display:grid; grid-template-columns:repeat(6,1fr); gap:4px; flex-wrap:nowrap;
+  background:var(--panel2); border:1px solid var(--line); border-radius:var(--radius-sm); padding:4px; box-shadow:var(--shadow-sm); }
+.bagtabs button{ border:none; background:transparent; box-shadow:none; border-radius:8px; color:var(--dim);
+  padding:8px 2px; min-height:38px; min-width:0; font-weight:700; text-align:center; }
+.bagtabs button:hover{ transform:none; background:rgba(128,128,128,.12); box-shadow:none; }
+.bagtabs button.sel{ background:var(--panel); color:var(--txt); box-shadow:var(--shadow-sm); }
+body.light .bagtabs button.sel{ background:#fff; }
+
+/* kit items → raised soft cards with hover lift */
+.bagitem{ border:none; background:var(--panel); border-radius:var(--radius); box-shadow:var(--shadow-sm);
+  padding:12px 13px 12px 30px; margin-bottom:9px; transition:transform .12s, box-shadow .12s; }
+.bagitem::before{ left:12px; top:12px; color:var(--dim); }
+.bagitem:hover{ transform:translateY(-2px); box-shadow:var(--shadow); }
+.bagitem .nm{ font-size:.84rem; font-weight:700; }
+.bagitem .ds{ font-size:.7rem; }
+
+/* vital read-out tiles → keep the clinical monitor look, just rounder */
+.vtile{ border-radius:var(--radius-sm); }
+.vgrid{ gap:8px; }
+
+/* event log → chat-style bubbles */
+#logbox{ display:flex; flex-direction:column; gap:7px; }
+#logbox .logrow{ background:var(--bub); border-radius:var(--radius-sm); padding:8px 11px 9px;
+  box-shadow:var(--shadow-sm); border-left:3px solid transparent; }
+#logbox .logrow.good{ border-left-color:var(--ok); }
+#logbox .logrow.bad{ border-left-color:var(--bad); }
+#logbox .logrow.warn{ border-left-color:var(--warn); }
+#logbox .logrow .t{ margin-right:8px; opacity:.65; }
+
+/* patient speech → friendly rounded bubble with a tail */
+#speech{ background:var(--bub); border:1px solid var(--line); border-radius:var(--radius-lg);
+  box-shadow:var(--shadow); font-style:normal; color:var(--txt); padding:11px 16px; }
+#speech::after{ content:''; position:absolute; left:28px; bottom:-7px; width:13px; height:13px; background:var(--bub);
+  border-right:1px solid var(--line); border-bottom:1px solid var(--line); transform:rotate(45deg); }
+
+/* diagnostics & tool buttons → pills; filled when attached */
+#diagbtns button,.toolbtns button{ border-radius:999px; }
+#diagbtns button.attached,.toolbtns button.attached{ background:var(--ok); border-color:transparent; color:#0c130e; }
+body.light #diagbtns button.attached,body.light .toolbtns button.attached{ background:#2f8159; color:#fff; }
+
+/* generic cards → soft elevation; lift where interactive */
+.optcard,.trainbox,.drillcard,.nextlesson{ border:none; box-shadow:var(--shadow-sm); border-radius:var(--radius); }
+.optcard:hover,.nextlesson:hover{ transform:translateY(-2px); box-shadow:var(--shadow); }
+.lchip{ box-shadow:var(--shadow-sm); }
+.hand{ border-radius:999px; box-shadow:var(--shadow-sm); }
+/* selected option cards → soft tint in Light (instead of a dark patch) */
+body.light .optcard.on{ background:#e6f0e8; box-shadow:inset 0 0 0 2px var(--ok), var(--shadow-sm); }
+body.light .optcard.on .optt{ color:#27613f; }
+body.light #optHardcoreCard.on{ background:#f4e2e2; box-shadow:inset 0 0 0 2px #c0544c, var(--shadow-sm); }
+body.light #optHardcoreCard.on .optt{ color:#a23a3a; }
+
+/* ============================================================
+   v0.5.5 — mobile / small-screen layout
+   ============================================================ */
+@media (max-width:820px){
+  html,body{ overflow:auto; height:auto; min-height:100%; }
+  .screen{ position:relative; min-height:100dvh; overflow-y:visible; }
+  /* stack the 3-column treatment grid into one scrolling column */
+  #game-grid{ grid-template-columns:1fr; grid-template-rows:auto; height:auto; min-height:100dvh; }
+  #topbar{ grid-column:auto; position:sticky; top:0; z-index:30; flex-wrap:wrap; height:auto;
+    min-height:52px; padding:8px 12px; padding-top:max(8px,env(safe-area-inset-top)); }
+  #leftpanel,#rightpanel{ grid-column:auto; border-left:none; border-right:none; border-bottom:1px solid var(--line); }
+  #bottombar{ grid-column:auto; grid-template-columns:1fr; padding-bottom:max(0px,env(safe-area-inset-bottom)); }
+  #centerstage{ min-height:54vh; }
+  #bodywrap svg{ height:min(46vh,360px) !important; }
+  #monitorCv{ height:118px; }
+  /* finger-friendly controls */
+  .bagtabs button{ min-height:46px; padding:12px 2px; font-size:.9rem; }
+  #diagbtns button{ min-height:44px; }
+  .bagitem{ padding:12px 12px 12px 28px; }
+  .tp-chip{ padding:10px 14px; }
+  #typeInput{ font-size:16px; }            /* 16px avoids iOS zoom-on-focus */
+  button{ min-height:40px; }
+  .center{ padding:20px 14px; min-height:auto; }
+  .ov.on,[id^="ov-"].on{ overflow-y:auto; -webkit-overflow-scrolling:touch; }
+}
+@media (max-width:480px){
+  #tb-title{ font-size:.92rem; }
+  .bagtabs{ gap:5px; }
+  h2{ font-size:.74rem; }
+}
 </style>
 </head>
-<body class="comfortable">
+<body class="light">
 
 <!-- ============ TITLE ============ -->
 <div class="screen on" id="scr-title">
   <div class="center">
     <div class="mono" style="font-size:.7rem;letter-spacing:.4em;color:var(--dim);">MEDICAL TRAINING AID · EDUCATIONAL USE</div>
     <h1 style="font-size:2.4rem;">MTA<span style="color:var(--dim);">:</span><span style="color:var(--hr);">LIFE</span>LINE</h1>
-    <div class="mono" style="color:#5a6c84;letter-spacing:.3em;font-size:.7rem;margin-top:-2px;">v0.5.4 · FIELD-TEST ALPHA</div>
-    <div class="note" style="letter-spacing:.25em;text-transform:uppercase;">Prehospital Trauma Decision Trainer</div>
+    <div class="mono" style="color:#5a6c84;letter-spacing:.3em;font-size:.7rem;margin-top:-2px;">v0.5.5 · Early Access Alpha</div>
+    <div class="note" style="letter-spacing:.25em;text-transform:uppercase;">First Aid Response Simulator</div>
     <div style="height:8px;"></div>
     <div class="disc"><b>Training aid — not a medical device.</b> LifeLine is an educational simulation for
       classroom, academy, and self-study use. Its mechanics are <i>inspired by</i> publicly taught doctrine
@@ -610,9 +776,9 @@ details.adv .adv-body{padding:4px 14px 14px;display:flex;flex-wrap:wrap;gap:10px
         <label class="optcard" id="optMarchPromptCard"><input type="checkbox" id="optMarchPrompt">
           <span class="optt">MARCH — steps, no status</span></label>
         <label class="optcard" id="optHardcoreCard"><input type="checkbox" id="optHardcore">
-          <span class="optt">Hardcore</span></label>
+          <span class="optt">Assessment</span></label>
       </div>
-      <div class="opts-foot" id="hardcoreNote">Hardcore strips the words away: no mechanism, no narration, no status read-out, no checklist — only the monitor, the patient, your kit, and the evac button. You and the numbers.</div>
+      <div class="opts-foot" id="hardcoreNote">Assessment strips the words away: no mechanism, no narration, no status read-out, no checklist — only the monitor, the patient, your kit, and the evac button. Because you work from your own knowledge, the result counts <b>double</b> — toward your readiness, and against it.</div>
     </div>
     <div id="mciLobbyCard">
       <div class="mci-lc-head">
@@ -629,7 +795,7 @@ details.adv .adv-body{padding:4px 14px 14px;display:flex;flex-wrap:wrap;gap:10px
     </div>
     <div style="height:6px;"></div>
     <label class="trainbox"><input type="checkbox" id="chkAssess">
-      <b>Assessment mode</b> — rated check-ride · credits your mastery profile · a pass on the next locked tier unlocks it. Leave off to drill (practice, with rewind).</label>
+      <b>Rated check-ride</b> — credits your mastery profile · a pass on the next locked tier unlocks it. Leave off to drill (practice, with rewind).</label>
     <div style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap;">
       <button id="btnKitTut" class="primary">How to read your kit</button>
       <button id="btnStats">Profile &amp; History</button>
@@ -647,8 +813,8 @@ details.adv .adv-body{padding:4px 14px 14px;display:flex;flex-wrap:wrap;gap:10px
     <div class="theme-toggle-row">
       <span class="ttl">Look:</span>
       <div class="rp-modetoggle" style="max-width:280px;flex:1;margin:0;">
-        <button id="themeComf">Comfortable</button>
-        <button id="themeMin">Minimalist</button>
+        <button id="themeLight">Light</button>
+        <button id="themeDark">Dark</button>
       </div>
     </div>
     <div class="note" id="saveNote" style="margin-top:4px;"></div>
@@ -952,6 +1118,9 @@ details.adv .adv-body{padding:4px 14px 14px;display:flex;flex-wrap:wrap;gap:10px
    metabolic / neuro) + pharmacokinetics + intervention decay.
    ============================================================ */
 const $=id=>document.getElementById(id);
+/* output-encoder: any string that originates from a save file (imported, possibly hand-crafted)
+   must be escaped before it ever touches innerHTML. Closes the only stored-XSS path. */
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 const clamp=(v,a,b)=>v<a?a:(v>b?b:v);
 const lerp=(a,b,t)=>a+(b-a)*t;
 const rnd=(a,b)=>a+Math.random()*(b-a);
@@ -1056,12 +1225,13 @@ function domainPerf(){
   return P;
 }
 // credit relevant domains toward demonstrated performance; returns per-domain deltas
-function applyMastery(perf, now){
+function applyMastery(perf, now, boost){
+  boost=boost||1;
   const deltas={};
   for(const k in perf){ const pf=perf[k]; if(!pf.rel) continue;
     if(!META.mastery[k]) META.mastery[k]={v:0,ts:0};
     const m=META.mastery[k]; const before=m.v, target=pf.score*100;
-    const rate=target>m.v?0.40:0.15;
+    const rate=clamp((target>m.v?0.40:0.15)*boost,0,0.92);
     m.v=clamp(m.v+(target-m.v)*rate,0,100); m.ts=now;
     deltas[k]=Math.round(m.v-before); }
   return deltas;
@@ -1103,7 +1273,7 @@ function drillRecommendation(){
   return {pick,reason:pick.raw===0?'untested':'weakest'};
 }
 
-let META={unlocked:1, records:{}, mastery:blankMastery(), history:[], campaign:{next:1, done:{}}, checkrides:{}, opId:'', theme:'comfortable', inputMode:'type'};
+let META={unlocked:1, records:{}, mastery:blankMastery(), history:[], campaign:{next:1, done:{}}, checkrides:{}, opId:'', theme:'light', inputMode:'type'};
 let storageOK=false;
 async function metaLoad(){ try{ if(window.storage&&window.storage.get){
   const r=await window.storage.get('mta_save'); if(r&&r.value){ const d=JSON.parse(r.value);
@@ -1428,6 +1598,7 @@ function logEv(type, msg, cls){
   S.events.push({t:S.t, type, msg, cls:cls||''});
   const lb=$('logbox'); if(!lb) return;
   const d=document.createElement('div');
+  d.className='logrow'+(cls?' '+cls:'');
   d.innerHTML='<span class="t mono">'+fmtT(S.t)+'</span><span class="'+(cls||'')+'">'+msg+'</span>';
   lb.appendChild(d); lb.scrollTop=lb.scrollHeight;
 }
@@ -2134,7 +2305,7 @@ function finishRun(outcome){
   else if(S.assessment){ rated=true; }
   let deltas=null;
   if(rated){
-    deltas = applyMastery(domainPerf(), Date.now());
+    deltas = applyMastery(domainPerf(), Date.now(), S.hardcore?2:1);
     // tier unlock via check-ride: clear any locked tier as an assessment (score≥70) and everything through it opens — this is the test-out
     if(!S.lesson && handed && P>=70 && S.tier>META.unlocked){
       META.unlocked=S.tier; META.checkrides['t'+S.tier]={ts:Date.now(),score:Math.round(P)};
@@ -2172,35 +2343,7 @@ const CODEX=[
  {id:'analgesia',t:'Analgesia in shock',b:'<p>Pain is worth treating — but <b>morphine</b> vasodilates and suppresses breathing, which is poison to a shocked patient. TCCC doctrine reaches for <b>ketamine</b>: pain control that holds the blood pressure. If an opioid was given and the breathing fails: <b>naloxone</b> reverses it. Aspirin and nitroglycerin belong to cardiac chest-pain protocols — in trauma they are traps.</p>'},
  {id:'tags',t:'What triage tags really mean',b:'<p>This game borrows triage colors as difficulty names — the real meanings matter. <b>Green</b>: walking wounded. <b>Yellow</b>: urgent, can wait briefly. <b>Red</b>: immediate. <b>Black — expectant</b>: in a mass-casualty event with limited hands, care goes to those it can still save. Black Tag mode exists so you feel <i>why</i>: flawless execution buying only seconds is the lesson, not a difficulty insult.</p>'},
  {id:'aar',t:'Reading your AAR',b:'<p>The graph is the patient\u2019s story; your interventions are the punctuation. Look for: did HR rise while BP held (compensation you should have noticed)? Did SpO₂ and BP fall together (tension)? Did the temp line sag the whole scenario (the triad you fed)? The verdict links each action to its physiological consequence — that causal chain is the thing worth memorizing, because it transfers.</p>'},
- {id:'whatsnew',t:'v0.5.0 — what changed',b:'<p><b>This is a major update \u2014 the first field-test alpha.</b> A testbed to show this is a tool with real potential, not a finished product.</p>'+
-   '<p><b>Pediatric patients.</b> A new lobby option simulates a child. Vital-sign baselines, circulating blood volume, heat loss, and bleeding all scale by age \u2014 derived directly from the Canadian Red Cross <i>Emergency Medical Responder</i> manual, Table 5-5 (Average Vital Signs by Age). The lesson the engine enforces: a normal child is tachycardic and relatively hypotensive by adult numbers, and a child holds blood pressure by racing the heart right up until a sudden collapse. <b>Read the trend, not the adult textbook value.</b></p>'+
-   '<p><b>Three difficulty options</b>, set in the lobby and applied to drills and check-rides. <b>Pediatric patient</b> (above). <b>Go in blind</b> \u2014 no mechanism-of-injury briefing; you diagnose from the body and the numbers, the way a real undifferentiated patient arrives, with the mechanism revealed at debrief. <b>Hide MARCH criteria</b> \u2014 removes the handoff checklist in the lower-right so you judge readiness for transport yourself; scoring is unchanged.</p>'+
-   '<p><b>Educational / institutional use.</b> The build now carries a clear training-aid (not a medical device) framing, an optional operator/cohort ID, and a <b>copyable session record</b> on the after-action report for an instructor\u2019s gradebook \u2014 your performance on the run, the options used, time-to-hemorrhage-control, and sequencing errors. It contains no patient data.</p>'+
-   '<p><b>Readiness levels replace the old ranks.</b> Progression is no longer a competitive tier (Bronze/Gold/Diamond). It is now expressed the way clinical educators express it \u2014 the supervision your demonstrated skill would warrant, from <b>Novice</b> (acts with hands-on coaching) through <b>Competent</b> (acts under indirect supervision) to <b>Expert</b> (independent in complex cases, ready to instruct). The overall level and the six-domain board now speak one vocabulary.</p>'+
-   '<p><b>Verified against the manual.</b> The engine\u2019s physiology was cross-referenced against the Red Cross EMR text \u2014 vitals, the compensated\u2192decompensated\u2192irreversible shock model, Cushing\u2019s triad, tension pneumothorax, burns and the Rule of Nines, and hypothermic coagulopathy all hold up. One <b>deliberate divergence</b>: the manual frames the tourniquet as a last resort, while LifeLine reflects current TCCC / Stop-the-Bleed practice \u2014 early tourniquet for life-threatening limb hemorrhage. Both agree on the mechanism.</p>'+
-   '<p class="cite">Alpha build. Trust the lesson, verify the dose, take the real course.</p>'},
- {id:'whatsnew051',t:'v0.5.1 — what changed',b:'<p><b>Hardcore mode.</b> A new option that strips the words away: no mechanism, no narration, no status read-out, no checklist, no hints. Only the monitor, the patient, your kit, and the evac button. You read the numbers and the body yourself, or you miss it.</p>'+
-   '<p><b>The golden-hour gauge is gone.</b> The analog clock was visual noise — deterioration was always readable in the trend of the vitals and the patient in front of you. The scenario options were simplified to plain labels.</p>'+
-   '<p><b>Traumatic arrest now obeys the cause.</b> Compressions and epinephrine alone will not restart a heart with an empty tank or a tension pneumothorax — you must fix the reversible cause first (control the bleeding, decompress the chest, fill the tank). This is the HOT algorithm: in trauma, the heart stops for a reason, and CPR is not that reason.</p>'+
-   '<p><b>Basilar skull fracture is now diagnosable.</b> The head-to-toe exam reports raccoon eyes and CSF from the ear when present — so choosing a nasal airway is a skill check you can pass by assessing first, not a coin flip.</p>'+
-   '<p><b>Infusion volume is tracked continuously</b>, so an interrupted bolus is recorded honestly in the debrief.</p>'+
-   '<p class="cite">A round of outside feedback was checked line-by-line against the engine. Most of the reported "exploits" \u2014 infinite-saline immortality, a drug-induced pulse in a dead patient, off-screen bleed-outs \u2014 were already prevented by the two-compartment blood model and the existing arrest logic. The few real issues were fixed; the rest are noted as already-handled.</p>'},
- {id:'whatsnew052',t:'v0.5.2 — what changed',b:'<p><b>MARCH, shown but not scored.</b> A new scenario option sits between the full checklist and hiding it entirely: the M-A-R-C-H steps are listed as prompts, but the live verdict is withheld. You work the sequence and decide for yourself whether each is met \u2014 the monitor and the patient tell you, not a row of checkmarks. A bridge between the training-wheels checklist and going fully unscaffolded.</p>'+
-   '<p><b>Triage debrief now tells you how each casualty died.</b> The Mass-Casualty after-action report reconstructs every death: exsanguination from an uncontrolled wound, asphyxia from an unmanaged airway, a Delayed patient who bled into Immediate while your back was turned, or a time-critical injury that outran the evac clock \u2014 and, for each preventable one, the single fast act that would have held them. The point of triage is not how well you treated one patient; it is how few you let slip.</p>'+
-   '<p><b>Cold fluid now chills a small body harder.</b> Infusion heat loss scales with patient mass, so an adult-sized bolus is a far larger thermal insult to a child \u2014 another reason adult volumes do not belong in pediatric patients.</p>'+
-   '<p><b>Fixes.</b> Re-securing a peeled chest seal when out of fresh ones no longer throws a false \u201cout of supplies\u201d message.</p>'+
-   '<p class="cite">A second outside bug report was audited against the code. Its headline claims \u2014 a broken triage matrix, \u201cghost-hand\u201d snapshot corruption on rewind, dead rendering code \u2014 did not hold up: the snapshot system already deep-clones and frees mid-action hands, and the triage grading was already correct. Where the report found something real (mass-independent cooling, a spurious seal toast), it was fixed. Its larger proposals \u2014 whole-blood citrate toxicity, RSI, flail chest, crush syndrome \u2014 are good ideas held for their own focused builds rather than rushed in.</p>'},
- {id:'whatsnew053',t:'v0.5.3 — what changed',b:'<p><b>A starting tutorial: "How to read your kit."</b> First-time players now get a short, skippable walkthrough of the main treatment menu \u2014 the one place every action comes from. It explains that the tabs are the MARCH sequence (the order you treat in), how to read a tool card (its name, the count of how many you have left, the one-line description, and what a greyed-out item means), and the two ways to use one: tap to send it to the wound that needs it most, or drag it onto a specific spot on the body. It opens once on a fresh profile and is always available from the lobby under <b>How to read your kit</b>.</p>'+
-   '<p class="cite">No engine or physiology changes in this build \u2014 onboarding only. The full regression and adversarial test suites were re-run and remain clean.</p>'},
- {id:'whatsnew0531',t:'v0.5.3.1 — what changed',b:'<p><b>An in-game field guide to the whole treatment screen.</b> The kit tutorial taught the Med-Bag; this goes further. A new <b>? Guide</b> button in the top bar opens a guided tour that spotlights every region of the screen in place and explains what each one shows \u2014 the scenario header, the monitor and its ECG, the vital signs, the diagnostics, the patient body, the acuity read-out, your hands, the Med-Bag, the action bar, the handoff criteria, and the evac button. Eleven stops, one at a time, with the rest of the screen dimmed so you know exactly what you are looking at.</p>'+
-   '<p>It <b>pauses the scenario</b> while it is open and resumes where you left off, and it skips any panel that is hidden by your difficulty options (so Hardcore players are not shown read-outs they chose to do without). It opens once automatically the first time you reach the treatment screen, and is always one tap away from the top bar afterward.</p>'+
-   '<p class="cite">Still onboarding only \u2014 no change to the engine, the physiology, or scoring. Regression (baseline, pediatric, textbook audit) and the 400-run adversarial archetype sweep were re-run and remain clean.</p>'},
- {id:'whatsnew054',t:'v0.5.4 — a gentler way in',b:'<p>Field-test feedback was blunt and fair: the hub read like code, and a civilian does not think in MARCH or know which tool to reach for. This build is the first answer to that \u2014 a softer on-ramp that leaves the professional sim underneath untouched.</p>'+
-   '<p><b>Type what you would do, in plain words.</b> A new <b>Type</b> input sits where the kit menu was. Write \u201capply a tourniquet on the left leg\u201d, \u201ccheck breathing\u201d, or \u201ccall for help\u201d and it drives the same engine the menu does \u2014 naming a place (\u201cleft leg\u201d, \u201cright chest\u201d) targets it, the way dragging would. Suggestion chips show common actions when the box is empty and filter as you type, so you are never staring at a blank line wondering what is possible. When you switch to typing, the <b>MARCH tab bar folds away</b> and the input takes its place; a <b>Type / Menu</b> toggle swaps back any time.</p>'+
-   '<p><b>A comfortable look.</b> The default skin is now warm and soft-edged, easier on the eye than the clinical telemetry palette. Prefer the original? A <b>Minimalist</b> toggle at the bottom of the lobby restores the dark professional look, and your choice is remembered.</p>'+
-   '<p><b>A calmer hub.</b> Save-management and instructor controls are tucked under an <i>Advanced &amp; instructor options</i> fold, so the first thing you see is how to start and how to learn.</p>'+
-   '<p class="cite">The physiology engine, scoring, and pathologies are unchanged. The typed parser routes to the same actions as the menu; the full regression and 400-run adversarial suites were re-run and remain clean. Next on the roadmap: a civilian Stop-the-Bleed framing of the kit with a bystander-scope toolset, and a guided first case.</p>'},
-];
+ ];
 let codexOpen=false, codexPausedSim=false;
 function renderCodex(focus){
   const toc=$('codexToc'), body=$('codexBody'); toc.innerHTML=''; body.innerHTML='';
@@ -2266,13 +2409,11 @@ function figureSVG(suffix, detail){
   return s;
 }
 function buildBody(){
-  let svg='<svg width="320" height="332" viewBox="0 0 280 290" style="overflow:visible;">';
+  // single enlarged anterior figure (supine "top-down" view). Posterior view removed in v0.5.5.
+  let svg='<svg viewBox="22 2 92 282" preserveAspectRatio="xMidYMid meet" style="overflow:visible;height:min(58vh,540px);width:auto;display:block;margin:0 auto;">';
   svg+='<ellipse id="bloodpool" cx="68" cy="278" rx="0" ry="0" fill="#7a1414" opacity="0.85"/>';
   svg+='<g id="bodyfill">';
-  svg+='<g transform="translate(148,0)">'+figureSVG('post','post')
-     +'<text x="60" y="285" text-anchor="middle" font-size="7.5" fill="#3a4a64" letter-spacing="3" pointer-events="none">POSTERIOR</text></g>';
-  svg+='<g transform="translate(8,0)">'+figureSVG('ant','ant')
-     +'<text x="60" y="285" text-anchor="middle" font-size="7.5" fill="#3a4a64" letter-spacing="3" pointer-events="none">ANTERIOR</text></g>';
+  svg+='<g transform="translate(8,0)">'+figureSVG('ant','ant')+'</g>';
   svg+='</g>';
   for(const k in HIT){ const a=HIT[k];
     svg+='<ellipse class="region" id="rg-'+k+'" cx="'+a[0]+'" cy="'+a[1]+'" rx="'+a[2]+'" ry="'+a[3]+'"/>'; }
@@ -2527,7 +2668,14 @@ function ecgY(ph,mode,h){
   return 0;
 }
 function drawMonitor(){
-  const c=$('monitorCv'); if(!c) return; const g=c.getContext('2d'),W=c.width|0,H=c.height|0;
+  const c=$('monitorCv'); if(!c||!c.getContext) return; const g=c.getContext('2d');
+  // device-pixel-ratio aware backing store: sharp on phones / hi-dpi, identical look (all math stays in CSS px)
+  const dpr=Math.min(window.devicePixelRatio||1,2);
+  const cssW=Math.round(c.clientWidth)||256, cssH=Math.round(c.clientHeight)||96;
+  const bw=Math.max(1,Math.round(cssW*dpr)), bh=Math.max(1,Math.round(cssH*dpr));
+  if(c.width!==bw||c.height!==bh){ c.width=bw; c.height=bh; c._buf=-1; }
+  g.setTransform(dpr,0,0,dpr,0,0);
+  const W=cssW, H=cssH;
   if(c._buf!==W){ c._buf=W; c._ecg=new Array(W).fill(null); c._plt=new Array(W).fill(null); c._col=0; c._ph=0; c._ph2=0; c._acc=0; }
   const dt=1/60, speed=70, arrest=!!S.arrest;
   const ecgMode = S.leads ? (arrest? (S.rhythm==='vf'?'vf':'asystole') : 'ns') : 'off';
@@ -2699,7 +2847,7 @@ function showAAR(){
   if(p.blind) modeBits.push('BLIND');
   if(p.hideMarch) modeBits.push('NO-SCAFFOLD');
   if(p.marchPrompt) modeBits.push('MARCH-PROMPT');
-  if(p.hardcore) modeBits.push('HARDCORE');
+  if(p.hardcore) modeBits.push('ASSESSMENT · 2×');
   $('aarSub').innerHTML=(p.lesson? 'LESSON '+p.lesson.n+' \u2014 '+p.lesson.title : p.T.chip)+' \u00b7 '+p.tpl.moi+' \u00b7 '+fmtT(p.t)+' elapsed'+(p.assessment===false&&!p.lesson?' \u00b7 DRILL (unrated practice)':'')+(modeBits.length?' \u00b7 <b style="color:#f0c59a;">'+modeBits.join(' \u00b7 ')+'</b>':'')+(p.blind?' <span class="note">(mechanism revealed at debrief)</span>':'');
   const pills=$('aarPills'); pills.innerHTML='';
   [['Time on patient',fmtT(p.t)],['Sequencing errors',p.seqErrors.length],['Saline given',p.salineGiven+' mL'],
@@ -2758,7 +2906,7 @@ function buildSessionRecord(p){
     : p.assessment? ('Rated check-ride — '+p.T.chip)
     : ('Drill (unrated) — '+p.T.chip);
   const opts=[]; if(p.peds) opts.push('Pediatric ('+p.ageBand+', ~'+p.age+' yr, ~'+p.weight+' kg)');
-  if(p.blind) opts.push('Blind / undifferentiated'); if(p.hideMarch) opts.push('No-scaffold (criteria hidden)'); if(p.marchPrompt) opts.push('MARCH steps shown, status withheld'); if(p.hardcore) opts.push('Hardcore (monitor only)');
+  if(p.blind) opts.push('Blind / undifferentiated'); if(p.hideMarch) opts.push('No-scaffold (criteria hidden)'); if(p.marchPrompt) opts.push('MARCH steps shown, status withheld'); if(p.hardcore) opts.push('Assessment (monitor only · 2× stakes)');
   const outcome = p.over==='dead'? 'PATIENT DIED'
     : p.over==='quit'? 'ABANDONED'
     : 'Handoff complete';
@@ -2768,7 +2916,7 @@ function buildSessionRecord(p){
   const errs = p.seqErrors.length? p.seqErrors.map(e=>'    - '+e.msg.split('—')[0].split('.')[0].trim()).join('\n') : '    (none)';
   const L=[];
   L.push('MTA: LifeLine — Session Record');
-  L.push('Build v0.5.4 (field-test alpha) · training simulation, not a clinical record');
+  L.push('Build v0.5.5 (early access alpha) · training simulation, not a clinical record');
   L.push('────────────────────────────────────');
   L.push('Date/time      : '+stamp);
   L.push('Operator/cohort: '+(META.opId||'(not set)'));
@@ -2869,7 +3017,7 @@ function startGame(tier, cfg, opts){
   const tag=$('tb-tag'); tag.className='tagchip '+S.T.cls; tag.textContent=S.T.chip;
   // mechanism-of-injury display: flashed up front on a normal run, withheld when blind
   if(S.hardcore){
-    $('tb-moi').textContent='HARDCORE — no readout but the monitor';
+    $('tb-moi').textContent='ASSESSMENT — monitor only';
     $('moiflash').classList.remove('show');
   } else if(S.blind){
     $('tb-moi').textContent='MECHANISM WITHHELD — assess the patient';
@@ -3245,7 +3393,7 @@ function openStats(){
     const d=document.createElement('div'); d.className='runrow';
     d.innerHTML='<span class="mono" style="color:#5a6c84;">'+when+'</span>'+
       '<span'+(x.rated?'':' style="color:#6a7a90;"')+'>'+mode+(x.rated?'':' \u00b7 unrated')+'</span>'+
-      '<span style="color:#8a9ab0;">'+x.moi+'</span>'+
+      '<span style="color:#8a9ab0;">'+esc(x.moi)+'</span>'+
       '<span class="'+outCls+'">'+outTxt+'</span>'+
       '<span class="mono">'+x.sc+'</span>'+
       '<span class="mono"'+(typeof x.thc==='number'&&x.thc<=60?' style="color:#9fe6b4;"':'')+'>'+(typeof x.thc==='number'?fmtT(x.thc):'\u2014')+'</span>';
@@ -3312,7 +3460,10 @@ function validateProfile(d){
     const r=clamp((+d.elo||0)/9999,0,1)*100*0.8, ts=Date.now();
     DOMAINS.forEach(dm=>mastery[dm.k]={v:Math.round(r),ts}); }
   const unlocked=clamp(Math.round(+d.unlocked|| (isFinite(d.elo)?1+Math.floor(clamp((+d.elo||0)/9999,0,1)*100*0.8/22):1) ),1,4);
-  const checkrides=(d.checkrides&&typeof d.checkrides==='object')?d.checkrides:{};
+  const checkrides={};
+  if(d.checkrides&&typeof d.checkrides==='object') for(const k of ['t1','t2','t3','t4']){
+    const c=d.checkrides[k];
+    if(c&&typeof c==='object') checkrides[k]={ts:Math.max(0,Math.round(+c.ts||0)), score:clamp(Math.round(+c.score||0),0,100)}; }
   const records={};
   if(d.records&&typeof d.records==='object') for(const k of ['t1','t2','t3','t4']){
     const r=d.records[k];
@@ -3326,12 +3477,12 @@ function validateProfile(d){
   const hist=[];
   if(Array.isArray(d.history)) for(const x of d.history.slice(-400)){
     if(!x||!isFinite(x.ts)) continue;
-    hist.push({ts:+x.ts, m:String(x.m||'T1').slice(0,4), moi:String(x.moi||'\u2014').slice(0,90),
+    hist.push({ts:+x.ts, m:String(x.m||'T1').slice(0,4), moi:String(x.moi||'\u2014').replace(/[<>]/g,'').slice(0,90),
       out:['save','pass','fail','death','quit'].includes(x.out)?x.out:'save',
       sc:clamp(Math.round(+x.sc||0),0,100), t:Math.max(0,Math.round(+x.t||0)),
       rated:!!x.rated, mode:['lesson','assess','drill'].includes(x.mode)?x.mode:undefined,
       thc:(typeof x.thc==='number'&&isFinite(x.thc))?Math.max(0,Math.round(x.thc)):null,
-      dead:(typeof x.dead==='string')?x.dead.slice(0,80):null,
+      dead:(typeof x.dead==='string')?x.dead.replace(/[<>]/g,'').slice(0,80):null,
       rdy:(typeof x.rdy==='number'&&isFinite(x.rdy))?clamp(Math.round(x.rdy),0,100):undefined}); }
   const chkV2 = d.chk===hashStr(JSON.stringify([d.mastery,d.unlocked,d.records,d.campaign,d.history]));
   const chkV1 = d.chk===hashStr(JSON.stringify([d.elo,d.records,d.campaign,d.history]));
@@ -3405,7 +3556,7 @@ const HG_STEPS=[
   {el:'vitboard',  t:'Vital signs',     d:'Heart rate, blood pressure, oxygen saturation, respiratory rate, temperature. <b>Read the trend, not the snapshot:</b> a rising heart rate while the pressure still holds is a patient compensating \u2014 until, suddenly, they can\u2019t.'},
   {el:'diagbtns',  t:'Diagnostics',     d:'Assessment tools \u2014 they don\u2019t treat, they <b>reveal</b>. Check a pulse, attach the monitor leads, the pulse-ox, a thermometer, run a head-to-toe exam. This is how you find out what is wrong.'},
   {el:'bodywrap',  t:'The patient',     d:'Wounds and findings appear on the body. <b>Tap a region</b> to assess it; <b>drag a tool</b> from your kit onto a wound to treat exactly there.'},
-  {el:'acuity',    t:'The read-out',    d:'How sick they are right now, in plain words, with a one-line status beneath. <i>Hidden in Hardcore</i> \u2014 then you read the monitor yourself.'},
+  {el:'acuity',    t:'The read-out',    d:'How sick they are right now, in plain words, with a one-line status beneath. <i>Hidden in Assessment</i> \u2014 then you read the monitor yourself.'},
   {el:'handsbox',  t:'Your hands',      d:'Some actions need one hand, some need two. Holding pressure or bagging <b>occupies a hand</b> until you let go \u2014 this shows what is currently tied up.'},
   {el:'rightpanel',t:'The Med-Bag',     d:'Your treatments, sorted by <b>MARCH</b>. Tap a tool to use it, or drag it onto a wound to target. The <b>How to read your kit</b> tutorial covers this menu in detail.'},
   {el:'channelbox',t:'The action bar',  d:'A timed action in progress \u2014 packing a wound, starting a line. <b>Tap anywhere to abort</b> it if you change your mind.'},
@@ -3465,7 +3616,7 @@ $('fileImport').onchange=e=>{ const f=e.target.files&&e.target.files[0]; e.targe
 $('btnWipe').onclick=async()=>{ sfx.ui();
   const ok=await gameConfirm('<b>Reset everything?</b><br><br>Your mastery profile, run history, campaign progress and tier unlocks all go back to zero. Export first if you want a backup.','Reset it all');
   if(!ok) return;
-  META={unlocked:1,records:{},mastery:blankMastery(),history:[],campaign:{next:1,done:{}},checkrides:{},theme:(META.theme||'comfortable'),inputMode:(META.inputMode||'type')}; metaSave(); renderLobby(); toast('Records wiped. Clean slate.','warnc'); };
+  META={unlocked:1,records:{},mastery:blankMastery(),history:[],campaign:{next:1,done:{}},checkrides:{},theme:(META.theme||'light'),inputMode:(META.inputMode||'type')}; metaSave(); renderLobby(); toast('Records wiped. Clean slate.','warnc'); };
 $('btnPause').onclick=()=>{ if(S&&!S.over) setPause(!S.paused); };
 $('btnResume').onclick=()=>{ setPause(false); };
 $('btnQuit').onclick=()=>{ if(!S||S.over){ phase='lobby'; renderLobby(); show('scr-lobby'); return; }
@@ -3511,11 +3662,12 @@ function frame(now){
    v0.5.4 — Comfortable theme + typed command interface
    ============================================================ */
 function applyTheme(){
-  const minimal=(META && META.theme==='minimalist');
-  document.body.classList.toggle('comfortable', !minimal);
-  const a=$('themeComf'), b=$('themeMin');
-  if(a) a.classList.toggle('on',!minimal);
-  if(b) b.classList.toggle('on',minimal);
+  if(META){ if(META.theme==='comfortable') META.theme='light'; else if(META.theme==='minimalist') META.theme='dark'; }
+  const dark=(META && META.theme==='dark');
+  document.body.classList.toggle('light', !dark);
+  const a=$('themeLight'), b=$('themeDark');
+  if(a) a.classList.toggle('on',!dark);
+  if(b) b.classList.toggle('on',dark);
 }
 function setTheme(t){ if(META){ META.theme=t; try{metaSave();}catch(e){} } applyTheme(); }
 
@@ -3642,8 +3794,8 @@ if($('typeInput')){
   $('typeInput').addEventListener('input',e=>renderSuggestions(e.target.value));
   $('typeInput').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); const v=e.target.value.trim(); if(v) execTyped(v); } });
 }
-if($('themeComf')) $('themeComf').onclick=()=>{ sfx.ui(); setTheme('comfortable'); };
-if($('themeMin'))  $('themeMin').onclick=()=>{ sfx.ui(); setTheme('minimalist'); };
+if($('themeLight')) $('themeLight').onclick=()=>{ sfx.ui(); setTheme('light'); };
+if($('themeDark'))  $('themeDark').onclick=()=>{ sfx.ui(); setTheme('dark'); };
 
 (async function boot(){
   await metaLoad();
