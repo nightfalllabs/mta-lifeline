@@ -6,7 +6,7 @@
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
-<title>MTA: LifeLine v0.5.5.1 — First Aid Response</title>
+<title>MTA: LifeLine v0.5.5.1 — First Aid Response Trainer</title>
 <style>
 :root{
   /* ---- core surface system (5 tokens) — deep slate, Mini-Motorways "night" ---- */
@@ -442,7 +442,6 @@ h2{font-size:.8rem;letter-spacing:.22em;text-transform:uppercase;color:var(--dim
 #game-grid.hc #acuity,
 #game-grid.hc #statusline,
 #game-grid.hc #envline,
-#game-grid.hc #speech,
 #game-grid.hc .bagitem .ds,
 #game-grid.hc .baghint,
 #game-grid.hc #logbox{ display:none !important; }
@@ -563,8 +562,6 @@ body.light .msv, body.light .bval,
 body.light .vit.unread .v{ color:var(--dim) !important; }
 /* the running event log is primary reading → full-strength ink */
 body.light #logbox{ color:var(--txt); }
-/* green "attached/active" accent on a light button face → dark green */
-body.light .toolbtns button.attached{ color:#2c7a52 !important; }
 
 /* ---- rounded + pastel component pass (both modes) ---- */
 button,.bagitem,.optcard,.trainbox,.tagchip,#leftpanel,#rightpanel,#centerstage,
@@ -611,6 +608,8 @@ details.adv[open]>summary::before{content:'\25BE ';}
 details.adv .adv-body{padding:4px 14px 14px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;}
 .theme-toggle-row{display:flex;align-items:center;gap:10px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line);}
 .theme-toggle-row .ttl{font-size:.8rem;color:var(--dim);}
+.intro-theme{position:absolute;top:16px;right:16px;width:auto;max-width:180px;margin:0;z-index:6;box-shadow:var(--shadow-sm);}
+.intro-theme button{padding:8px 14px;font-size:.78rem;}
 /* ============================================================
    v0.5.5 — GUI DESIGN OVERHAUL (soft, elevated; shared by Light & Dark)
    The ECG monitor and the vital read-out tiles stay clinical/dark on purpose.
@@ -725,11 +724,15 @@ body.light #optHardcoreCard.on .optt{ color:#a23a3a; }
 
 <!-- ============ TITLE ============ -->
 <div class="screen on" id="scr-title">
+  <div class="intro-theme rp-modetoggle">
+    <button class="theme-opt" data-theme="light">Light</button>
+    <button class="theme-opt" data-theme="dark">Dark</button>
+  </div>
   <div class="center">
     <div class="mono" style="font-size:.7rem;letter-spacing:.4em;color:var(--dim);">MEDICAL TRAINING AID · EDUCATIONAL USE</div>
     <h1 style="font-size:2.4rem;">MTA<span style="color:var(--dim);">:</span><span style="color:var(--hr);">LIFE</span>LINE</h1>
-    <div class="mono" style="color:#5a6c84;letter-spacing:.3em;font-size:.7rem;margin-top:-2px;">v0.5.5 · Early Access Alpha</div>
-    <div class="note" style="letter-spacing:.25em;text-transform:uppercase;">First Aid Response Simulator</div>
+    <div class="mono" style="color:#5a6c84;letter-spacing:.3em;font-size:.7rem;margin-top:-2px;">v0.5.5.1 · FIELD-TEST ALPHA</div>
+    <div class="note" style="letter-spacing:.25em;text-transform:uppercase;">First Aid Response Trainer</div>
     <div style="height:8px;"></div>
     <div class="disc"><b>Training aid — not a medical device.</b> LifeLine is an educational simulation for
       classroom, academy, and self-study use. Its mechanics are <i>inspired by</i> publicly taught doctrine
@@ -813,8 +816,8 @@ body.light #optHardcoreCard.on .optt{ color:#a23a3a; }
     <div class="theme-toggle-row">
       <span class="ttl">Look:</span>
       <div class="rp-modetoggle" style="max-width:280px;flex:1;margin:0;">
-        <button id="themeLight">Light</button>
-        <button id="themeDark">Dark</button>
+        <button id="themeLight" class="theme-opt" data-theme="light">Light</button>
+        <button id="themeDark" class="theme-opt" data-theme="dark">Dark</button>
       </div>
     </div>
     <div class="note" id="saveNote" style="margin-top:4px;"></div>
@@ -2916,7 +2919,7 @@ function buildSessionRecord(p){
   const errs = p.seqErrors.length? p.seqErrors.map(e=>'    - '+e.msg.split('—')[0].split('.')[0].trim()).join('\n') : '    (none)';
   const L=[];
   L.push('MTA: LifeLine — Session Record');
-  L.push('Build v0.5.5 (early access alpha) · training simulation, not a clinical record');
+  L.push('Build v0.5.5.1 (field-test alpha) · training simulation, not a clinical record');
   L.push('────────────────────────────────────');
   L.push('Date/time      : '+stamp);
   L.push('Operator/cohort: '+(META.opId||'(not set)'));
@@ -3665,9 +3668,7 @@ function applyTheme(){
   if(META){ if(META.theme==='comfortable') META.theme='light'; else if(META.theme==='minimalist') META.theme='dark'; }
   const dark=(META && META.theme==='dark');
   document.body.classList.toggle('light', !dark);
-  const a=$('themeLight'), b=$('themeDark');
-  if(a) a.classList.toggle('on',!dark);
-  if(b) b.classList.toggle('on',dark);
+  document.querySelectorAll('.theme-opt').forEach(b=>b.classList.toggle('on',(b.dataset.theme==='dark')===dark));
 }
 function setTheme(t){ if(META){ META.theme=t; try{metaSave();}catch(e){} } applyTheme(); }
 
@@ -3794,8 +3795,7 @@ if($('typeInput')){
   $('typeInput').addEventListener('input',e=>renderSuggestions(e.target.value));
   $('typeInput').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); const v=e.target.value.trim(); if(v) execTyped(v); } });
 }
-if($('themeLight')) $('themeLight').onclick=()=>{ sfx.ui(); setTheme('light'); };
-if($('themeDark'))  $('themeDark').onclick=()=>{ sfx.ui(); setTheme('dark'); };
+document.querySelectorAll('.theme-opt').forEach(b=>{ b.onclick=()=>{ sfx.ui(); setTheme(b.dataset.theme); }; });
 
 (async function boot(){
   await metaLoad();
