@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline' 'self'; style-src 'unsafe-inline' 'self'; img-src 'self' data: blob:; media-src 'self' data: blob:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline' 'self'; style-src 'unsafe-inline' 'self'; img-src 'self' data: blob:; media-src 'self' data: blob:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; worker-src 'none'; child-src 'none'; manifest-src 'none'; frame-ancestors 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
-<title>MTA: LifeLine v0.5.5.1 — First Aid Response Trainer</title>
+<title>MTA: LifeLine v0.5.5.4 — First Aid Response Trainer</title>
 <style>
 :root{
   /* ---- core surface system (5 tokens) — deep slate, Mini-Motorways "night" ---- */
@@ -53,10 +53,10 @@ h2{font-size:.8rem;letter-spacing:.22em;text-transform:uppercase;color:var(--dim
 .tiers{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;max-width:1100px;}
 .tier{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px;width:250px;
   cursor:pointer;transition:all .15s;position:relative;}
-.tier:hover{transform:translateY(-3px);border-color:#3f5170;}
+.tier:hover{border-color:#3f5170;box-shadow:var(--shadow);}
 .tier.locked{opacity:.45;cursor:not-allowed;}
 .tier.checkride{opacity:.92;cursor:pointer;border-color:rgba(232,195,100,.5);border-style:dashed;}
-.tier.checkride:hover{transform:translateY(-3px);border-color:#e8c364;}
+.tier.checkride:hover{border-color:#e8c364;box-shadow:var(--shadow);}
 .tier .lockmsg{color:#9aa3ad;line-height:1.5;}
 .tier h3{font-size:1rem;margin:10px 0 6px;}
 .tier p{font-size:.76rem;color:var(--dim);line-height:1.5;min-height:74px;}
@@ -84,8 +84,8 @@ h2{font-size:.8rem;letter-spacing:.22em;text-transform:uppercase;color:var(--dim
 .vtile.off{opacity:.5;}
 .vk{font-size:.58rem;letter-spacing:.14em;color:var(--dim);display:flex;justify-content:space-between;align-items:center;}
 .vv{font-size:1.55rem;font-weight:600;line-height:1.12;font-variant-numeric:tabular-nums;letter-spacing:.01em;}
-.vu{font-size:.6rem;color:#5a6c84;margin-left:3px;font-weight:400;}
-.vsub{font-size:.56rem;color:#52647d;letter-spacing:.02em;}
+.vu{font-size:.6rem;color:var(--dim);margin-left:3px;font-weight:400;}
+.vsub{font-size:.56rem;color:var(--dim);letter-spacing:.02em;}
 .vtile.al-warn{border-color:#caa23f;box-shadow:inset 0 0 0 1px rgba(202,162,63,.35);}
 .vtile.al-crit{border-color:#e0484a;animation:valarm .9s steps(2,end) infinite;}
 @keyframes valarm{0%{box-shadow:inset 0 0 0 2px rgba(224,72,74,0);}50%{box-shadow:inset 0 0 0 2px rgba(224,72,74,.75);background:#180b0d;}100%{box-shadow:inset 0 0 0 2px rgba(224,72,74,0);}}
@@ -149,7 +149,7 @@ h2{font-size:.8rem;letter-spacing:.22em;text-transform:uppercase;color:var(--dim
   box-shadow:0 6px 18px rgba(0,0,0,.55);white-space:nowrap;}
 /* bottom: log + actions */
 #logbox{padding:10px 14px;overflow-y:auto;font-size:.74rem;line-height:1.7;color:#aebccd;}
-#logbox .t{color:#5a6c84;margin-right:8px;}
+#logbox .t{color:var(--dim);margin-right:8px;}
 #logbox .bad{color:var(--bad);} #logbox .good{color:var(--ok);} #logbox .warn{color:var(--warn);}
 #evacbox{padding:10px;display:flex;flex-direction:column;gap:6px;}
 #critlist{font-size:.68rem;line-height:1.7;color:var(--dim);}
@@ -212,7 +212,7 @@ h2{font-size:.8rem;letter-spacing:.22em;text-transform:uppercase;color:var(--dim
 .rkrow{display:flex;align-items:center;gap:14px;}
 .rbadge{font-weight:700;letter-spacing:.12em;padding:5px 14px;border-radius:6px;border:1.5px solid;font-size:.78rem;white-space:nowrap;}
 .rdy{font-size:1.5rem;font-weight:700;}
-.rdyl{font-size:.7rem;color:#5a6c84;font-weight:400;margin-left:3px;letter-spacing:.02em;}
+.rdyl{font-size:.7rem;color:var(--dim);font-weight:400;margin-left:3px;letter-spacing:.02em;}
 .rkrow button{margin-left:auto;}
 .mbars{display:flex;gap:10px;width:100%;}
 .mbars.compact{gap:6px;}
@@ -228,7 +228,7 @@ h2{font-size:.8rem;letter-spacing:.22em;text-transform:uppercase;color:var(--dim
 #campNext{max-width:760px;width:100%;}
 .nextlesson{background:var(--panel);border:1px solid #2f7a5c;border-radius:10px;padding:14px 18px;margin-top:10px;
   cursor:pointer;transition:all .15s;}
-.nextlesson:hover{transform:translateY(-2px);background:#17251f;}
+.nextlesson:hover{background:#17251f;}
 .nextlesson .ln{font-size:.68rem;letter-spacing:.2em;color:#9af0c0;}
 .nextlesson h3{margin:4px 0;}
 .nextlesson p{font-size:.76rem;color:var(--dim);line-height:1.5;}
@@ -249,7 +249,7 @@ h2{font-size:.8rem;letter-spacing:.22em;text-transform:uppercase;color:var(--dim
 .msL{font-weight:800;font-size:.92rem;text-align:center;}
 .msname{color:#c4cedd;}
 .msv{text-align:right;color:#9fb0c6;}
-.msnote{color:#5a6c84;font-size:.7rem;text-align:right;}
+.msnote{color:var(--dim);font-size:.7rem;text-align:right;}
 /* ---- readiness board: entrustment competency matrix ---- */
 .board{margin:6px 0 4px;}
 .bcard{display:grid;grid-template-columns:36px 1fr 104px;gap:12px;align-items:center;padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:var(--panel2);margin-bottom:7px;}
@@ -262,10 +262,10 @@ h2{font-size:.8rem;letter-spacing:.22em;text-transform:uppercase;color:var(--dim
 .bclaim{color:#8a9ab0;font-size:.7rem;font-style:italic;}
 .bbar{display:flex;align-items:center;gap:8px;}
 .bval{font-size:.72rem;color:#9fb0c6;white-space:nowrap;}
-.bnote{font-size:.66rem;color:#5a6c84;}
+.bnote{font-size:.66rem;color:var(--dim);}
 .bcur{display:flex;flex-direction:column;align-items:flex-end;gap:3px;text-align:right;}
 .curchip{font-size:.58rem;font-weight:700;letter-spacing:.07em;padding:2px 8px;border-radius:11px;border:1px solid;white-space:nowrap;}
-.bago{font-size:.62rem;color:#566a83;}
+.bago{font-size:.62rem;color:var(--dim);}
 .drillcard{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:8px;border:1px solid #3a5170;background:linear-gradient(90deg,rgba(58,81,112,.22),rgba(58,81,112,.04));margin:4px 0 14px;}
 .drillcard .dot{font-size:1.1rem;color:#7fb0e6;}
 .drillcard b{color:#bcd0ea;}
@@ -348,7 +348,7 @@ h2{font-size:.8rem;letter-spacing:.22em;text-transform:uppercase;color:var(--dim
 .mci-deaths h3{font-size:.7rem;letter-spacing:.12em;color:var(--dim);text-transform:uppercase;margin:4px 0 10px;}
 .mci-death{border-left:3px solid #34405a;padding:8px 0 8px 12px;margin-bottom:10px;}
 .mci-death.prv{border-left-color:#d65a6a;}
-.mci-death.exp{border-left-color:#5a6c84;}
+.mci-death.exp{border-left-color:var(--dim);}
 .mci-death .mdh{font-size:.78rem;color:var(--txt);display:flex;align-items:center;gap:8px;margin-bottom:3px;}
 .mci-death .mdb{font-size:.74rem;color:#aeb9cb;line-height:1.5;}
 .mci-death .mdf{font-size:.74rem;color:#7fe3b6;line-height:1.5;margin-top:3px;}
@@ -388,7 +388,7 @@ h2{font-size:.8rem;letter-spacing:.22em;text-transform:uppercase;color:var(--dim
 #optsPanel{width:100%;max-width:1100px;background:var(--panel);border:1px solid var(--line);
   border-radius:10px;padding:14px 16px;margin:4px 0;}
 .opts-head{font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);margin-bottom:10px;}
-.opts-sub{letter-spacing:.04em;text-transform:none;color:#5a6c84;font-size:.92em;}
+.opts-sub{letter-spacing:.04em;text-transform:none;color:var(--dim);font-size:.92em;}
 .opts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;}
 .optcard{display:block;background:var(--panel2);border:1px solid var(--line);border-radius:8px;
   padding:12px 14px 12px 38px;position:relative;cursor:pointer;transition:border-color .12s,background .12s;}
@@ -426,7 +426,7 @@ h2{font-size:.8rem;letter-spacing:.22em;text-transform:uppercase;color:var(--dim
 /* ---- v0.5.0: operator / cohort ID field ---- */
 .idrow{display:flex;flex-direction:column;align-items:center;gap:5px;}
 .idrow label{font-size:.72rem;letter-spacing:.06em;color:var(--dim);text-transform:uppercase;}
-.idrow label span{text-transform:none;color:#5a6c84;letter-spacing:0;}
+.idrow label span{text-transform:none;color:var(--dim);letter-spacing:0;}
 .idrow input{font-family:inherit;background:var(--panel2);border:1px solid var(--line);color:var(--txt);
   border-radius:6px;padding:8px 12px;width:320px;max-width:80vw;font-size:.82rem;text-align:center;}
 .idrow input:focus{outline:none;border-color:#3f5170;}
@@ -627,12 +627,12 @@ h2{ text-transform:none; letter-spacing:.005em; font-size:.92rem; font-weight:70
 
 /* buttons → chunky rounded, soft shadow, gentle lift */
 button{ border-radius:var(--radius); border:1px solid var(--line); background:var(--panel2); color:var(--txt);
-  font-weight:600; box-shadow:var(--shadow-sm);
-  transition:transform .12s, box-shadow .12s, background .12s, border-color .12s, filter .12s; }
-button:hover{ transform:translateY(-1px); box-shadow:var(--shadow); }
-button:active{ transform:translateY(0); box-shadow:var(--shadow-sm); }
+  font-weight:600; box-shadow:var(--shadow-sm); touch-action:manipulation; user-select:none; -webkit-user-select:none;
+  transition:background .1s, border-color .1s, box-shadow .1s, filter .1s; }
+button:hover{ filter:brightness(1.14); box-shadow:var(--shadow); }
+button:active{ filter:brightness(0.9); box-shadow:var(--shadow-sm); }
 button.primary{ background:var(--ok); border-color:transparent; color:#0c130e; }
-button.primary:hover{ background:var(--ok); filter:brightness(1.07); }
+button.primary:hover{ background:var(--ok); filter:brightness(1.1); }
 body.light button.primary{ background:#2f8159; border-color:transparent; color:#fff; }
 body.light button.primary:hover{ background:#2f8159; filter:brightness(1.06); }
 
@@ -649,7 +649,7 @@ body.light .bagtabs button.sel{ background:#fff; }
 .bagitem{ border:none; background:var(--panel); border-radius:var(--radius); box-shadow:var(--shadow-sm);
   padding:12px 13px 12px 30px; margin-bottom:9px; transition:transform .12s, box-shadow .12s; }
 .bagitem::before{ left:12px; top:12px; color:var(--dim); }
-.bagitem:hover{ transform:translateY(-2px); box-shadow:var(--shadow); }
+.bagitem:hover{ box-shadow:var(--shadow); filter:brightness(1.05); }
 .bagitem .nm{ font-size:.84rem; font-weight:700; }
 .bagitem .ds{ font-size:.7rem; }
 
@@ -679,7 +679,7 @@ body.light #diagbtns button.attached,body.light .toolbtns button.attached{ backg
 
 /* generic cards → soft elevation; lift where interactive */
 .optcard,.trainbox,.drillcard,.nextlesson{ border:none; box-shadow:var(--shadow-sm); border-radius:var(--radius); }
-.optcard:hover,.nextlesson:hover{ transform:translateY(-2px); box-shadow:var(--shadow); }
+.optcard:hover,.nextlesson:hover{ box-shadow:var(--shadow); filter:brightness(1.04); }
 .lchip{ box-shadow:var(--shadow-sm); }
 .hand{ border-radius:999px; box-shadow:var(--shadow-sm); }
 /* selected option cards → soft tint in Light (instead of a dark patch) */
@@ -731,7 +731,7 @@ body.light #optHardcoreCard.on .optt{ color:#a23a3a; }
   <div class="center">
     <div class="mono" style="font-size:.7rem;letter-spacing:.4em;color:var(--dim);">MEDICAL TRAINING AID · EDUCATIONAL USE</div>
     <h1 style="font-size:2.4rem;">MTA<span style="color:var(--dim);">:</span><span style="color:var(--hr);">LIFE</span>LINE</h1>
-    <div class="mono" style="color:#5a6c84;letter-spacing:.3em;font-size:.7rem;margin-top:-2px;">v0.5.5.1 · FIELD-TEST ALPHA</div>
+    <div class="mono" style="color:var(--dim);letter-spacing:.3em;font-size:.7rem;margin-top:-2px;">v0.5.5.4 · FIELD-TEST ALPHA</div>
     <div class="note" style="letter-spacing:.25em;text-transform:uppercase;">First Aid Response Trainer</div>
     <div style="height:8px;"></div>
     <div class="disc"><b>Training aid — not a medical device.</b> LifeLine is an educational simulation for
@@ -797,15 +797,16 @@ body.light #optHardcoreCard.on .optt{ color:#a23a3a; }
       </div>
     </div>
     <div style="height:6px;"></div>
-    <label class="trainbox"><input type="checkbox" id="chkAssess">
+    <label class="trainbox" id="trainRow"><input type="checkbox" id="chkAssess">
       <b>Rated check-ride</b> — credits your mastery profile · a pass on the next locked tier unlocks it. Leave off to drill (practice, with rewind).</label>
     <div style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap;">
       <button id="btnKitTut" class="primary">How to read your kit</button>
       <button id="btnStats">Profile &amp; History</button>
       <button id="btnCodexL">Open the Codex</button>
+      <button id="btnLobbyGuide" title="Walk through what everything on this screen does">? Tour the menu</button>
     </div>
     <details class="adv">
-      <summary>Saving/Loading Options</summary>
+      <summary>Advanced &amp; instructor options</summary>
       <div class="adv-body">
         <button id="btnExport" title="Download your profile as a file">Export Save</button>
         <button id="btnImport" title="Load a previously exported profile">Import Save</button>
@@ -813,7 +814,7 @@ body.light #optHardcoreCard.on .optt{ color:#a23a3a; }
         <input type="file" id="fileImport" accept=".json,application/json" style="display:none;">
       </div>
     </details>
-    <div class="theme-toggle-row">
+    <div class="theme-toggle-row" id="themeRow">
       <span class="ttl">Look:</span>
       <div class="rp-modetoggle" style="max-width:280px;flex:1;margin:0;">
         <button id="themeLight" class="theme-opt" data-theme="light">Light</button>
@@ -982,7 +983,7 @@ body.light #optHardcoreCard.on .optt{ color:#a23a3a; }
       <h2>Casualty</h2>
       <div id="mciPanel"><div class="mci-empty">Walk the scene.</div></div>
       <div id="mciLegend">
-        <div class="mci-lgrow"><b>START sort</b> &mdash; the only field actions are <b>tourniquet</b> and <b>open airway</b>. Everything else waits. The job is to <b>tag</b>.</div>
+        <div class="mci-lgrow"><b>START</b> &mdash; sort on <b>R&middot;P&middot;M</b> (Respirations, Perfusion, Mental status): the <i>30&ndash;2&ndash;Can&nbsp;Do</i> check. Field actions are <b>tourniquet</b> and <b>open airway</b> only; everything else waits. The job is to <b>tag</b>.</div>
         <div class="mci-lgrow"><span class="mci-cnt t-red">IMMEDIATE</span> can't follow / RR&gt;30 / no radial / breathes only after airway</div>
         <div class="mci-lgrow"><span class="mci-cnt t-yellow">DELAYED</span> perfusing, follows commands, but injured</div>
         <div class="mci-lgrow"><span class="mci-cnt t-green">MINOR</span> walking wounded (Global Sort clears these)</div>
@@ -1284,6 +1285,9 @@ async function metaLoad(){ try{ if(window.storage&&window.storage.get){
     META.mastery=sanitizeMastery(d.mastery); META.checkrides=(d.checkrides&&typeof d.checkrides==='object')?d.checkrides:{};
     META.unlocked=clamp(Math.round(+d.unlocked||1),1,4);
     META.opId=(typeof d.opId==='string')? d.opId.slice(0,40) : '';
+    if(typeof d.theme==='string') META.theme=d.theme;                 // restore chosen look (was silently resetting on reload)
+    if(d.inputMode==='tap'||d.inputMode==='type') META.inputMode=d.inputMode;
+    META.hudSeen=!!d.hudSeen; META.lobbySeen=!!d.lobbySeen; META.tutSeen=!!d.tutSeen;  // onboarding "already shown" flags
     if(d.mastery===undefined && isFinite(d.elo)) seedMasteryFromElo(d.elo); // migrate legacy saves
     unlockFromCampaign();
   } storageOK=true; } }
@@ -2033,7 +2037,7 @@ const BAG=[
    if(handsFree()<1){ toast('No free hand to hold pressure.','warnc'); return; }
    occupyHands(1,'Pressure'); j.ctl.pressure=true; j._pressT=S.t;
    logEv('tx','Direct pressure on the '+j.name.split('—')[0].trim()+'.'); }},
- {id:'tq',tab:'M',nm:'Arterial tourniquet (CAT)',ds:'High & tight on the limb. Reassess — windlasses slip.',hands:2,secs:5,item:'tq',
+ {id:'tq',tab:'M',nm:'Arterial tourniquet (CAT)',ds:'2–3 in above the wound, not over a joint. Tighten until the bleeding stops. Reassess — windlasses slip.',hands:2,secs:5,item:'tq',
   act(){ const j=targetInjury(x=>x.vessel&&!x.internal&&!x.junctional&&!x.chest&&!x.airwayBlood&&x.exposed&&!x.ctl.tq,'No limb bleed exposed for a TQ.');
    if(!j) return; if(!needItem('tq'))return; useItem('tq');
    j.ctl.tq=true; j.ctl.tqTight=1; j.ctl.tqLife=S.decay.tq? rnd(S.decay.tq[0],S.decay.tq[1]):rnd(80,140); j.ctl.tqT=0;
@@ -2573,7 +2577,26 @@ function addDrag(el, it){
     document.addEventListener('pointerup',onUp);
   };
 }
-function renderBag(){
+function bagSig(){
+  if(!S) return '';
+  let s=bagTab+'|'+(S.T?S.T.cert:'')+'|';
+  for(const it of BAG){
+    if(it.tab!==bagTab) continue;
+    if(it.show && !it.show()) continue;
+    if(it.item && S.bag[it.item]===undefined) continue;
+    const cnt=it.item?(S.bag[it.item]||0):'';
+    const dis=(it.item&&(S.bag[it.item]||0)<=0&&it.id!=='wipe')?'d':'';
+    s+=it.id+cnt+dis+';';
+  }
+  return s;
+}
+function renderBag(force){
+  // Only rebuild the tab bar + kit list when their content actually changed. The frame
+  // loop calls renderAll() ~3×/s; rebuilding these buttons every time reset hover state
+  // (flicker) and destroyed elements mid-click (missed taps). Skip when nothing changed.
+  const sig=bagSig();
+  if(!force && sig===renderBag._sig){ if(typeof applyInputMode==='function') applyInputMode(); return; }
+  renderBag._sig=sig;
   const bt=$('bagtabs'); bt.innerHTML='';
   const TAB_COL={M:'#e2555f',A:'#5fd2e8',R:'#67e08a',C:'#e8c364',H:'#7ab8ff',MED:'#b98df0'};
   TABS.forEach(([k,lbl])=>{ const b=document.createElement('button'); b.textContent=lbl;
@@ -2881,7 +2904,7 @@ function showAAR(){
   $('aarVerdict').innerHTML=banner+(p.over==='dead'?buildAutopsy(p):'')+buildVerdict();
   const ev=$('aarEvents'); ev.innerHTML='';
   p.events.forEach(e=>{ const d=document.createElement('div');
-    d.innerHTML='<span class="t mono" style="color:#5a6c84;margin-right:8px;">'+fmtT(e.t)+'</span><span class="'+(e.cls||'')+'">'+e.msg+'</span>';
+    d.innerHTML='<span class="t mono" style="color:var(--dim);margin-right:8px;">'+fmtT(e.t)+'</span><span class="'+(e.cls||'')+'">'+e.msg+'</span>';
     ev.appendChild(d); });
   // rewind (training only)
   const rb=$('rewindbox');
@@ -2919,7 +2942,7 @@ function buildSessionRecord(p){
   const errs = p.seqErrors.length? p.seqErrors.map(e=>'    - '+e.msg.split('—')[0].split('.')[0].trim()).join('\n') : '    (none)';
   const L=[];
   L.push('MTA: LifeLine — Session Record');
-  L.push('Build v0.5.5.1 (field-test alpha) · training simulation, not a clinical record');
+  L.push('Build v0.5.5.4 (field-test alpha) · training simulation, not a clinical record');
   L.push('────────────────────────────────────');
   L.push('Date/time      : '+stamp);
   L.push('Operator/cohort: '+(META.opId||'(not set)'));
@@ -3005,6 +3028,7 @@ function flashMOI(text){
 }
 function startGame(tier, cfg, opts){
   aInit();
+  renderBag._sig=null;   // force a fresh kit render for the new scenario
   // free-play / check-ride: read the scenario-option toggles into the run options
   if(!cfg){ RUNOPTS={
     peds:      !!($('optPeds')      && $('optPeds').checked),
@@ -3318,7 +3342,7 @@ function openStats(){
     '<div class="bcard" style="grid-template-columns:auto 1fr;background:var(--panel);">'+
       '<span class="rbadge" style="color:'+st.col+';border-color:'+st.col+';">'+st.stage.toUpperCase()+' \u00b7 '+st.scope+'</span>'+
       '<div class="bmain"><div class="btop">'+
-        '<span class="mono" style="font-size:1.2rem;">'+rdy+'<span style="font-size:.62rem;color:#5a6c84;"> /100 mean readiness</span></span>'+
+        '<span class="mono" style="font-size:1.2rem;">'+rdy+'<span style="font-size:.62rem;color:var(--dim);"> /100 mean readiness</span></span>'+
         '<span class="bclaim">'+st.entrust+(rdy>=95?' \u00b7 ready to instruct':'')+'</span></div>'+
       '<div class="bnote">Your overall readiness level \u2014 the mean across your six domains, expressed as the supervision your demonstrated skill would warrant. A summary, not the whole story; the board below is where your strengths and gaps actually live.</div>'+
       '</div></div>';
@@ -3367,7 +3391,7 @@ function openStats(){
           '<span class="bclaim">'+ent.claim+'</span></div>'+
         '<div class="bbar"><div class="mtrack"><i style="width:'+eff+'%;background:'+d.col+';"></i>'+
           (rust>0?'<u style="left:'+eff+'%;width:'+Math.min(rust,100-eff)+'%;"></u>':'')+'</div>'+
-          '<span class="bval mono">'+eff+'<span style="color:#5a6c84;">/100</span>'+
+          '<span class="bval mono">'+eff+'<span style="color:var(--dim);">/100</span>'+
           (rust>0?' <span style="color:#c87a7a;">\u2212'+rust+'</span>':'')+'</span></div>'+
         (sub?'<div class="bnote">'+sub+'</div>':'')+
       '</div>'+
@@ -3394,7 +3418,7 @@ function openStats(){
       : x.mode==='drill'?'Drill \u00b7 '+['','GRN','YLW','RED','BLK'][+x.m.slice(1)]
       : (x.m[0]==='L'?'Lesson '+x.m.slice(1):'Free \u00b7 '+['','GRN','YLW','RED','BLK'][+x.m.slice(1)]);
     const d=document.createElement('div'); d.className='runrow';
-    d.innerHTML='<span class="mono" style="color:#5a6c84;">'+when+'</span>'+
+    d.innerHTML='<span class="mono" style="color:var(--dim);">'+when+'</span>'+
       '<span'+(x.rated?'':' style="color:#6a7a90;"')+'>'+mode+(x.rated?'':' \u00b7 unrated')+'</span>'+
       '<span style="color:#8a9ab0;">'+esc(x.moi)+'</span>'+
       '<span class="'+outCls+'">'+outTxt+'</span>'+
@@ -3528,7 +3552,12 @@ async function importProfileFile(file){
 /* ============================================================
    WIRING & MAIN LOOP
    ============================================================ */
-$('btnEnter').onclick=()=>{ aInit(); sfx.ui(); phase='lobby'; renderLobby(); show('scr-lobby'); };
+$('btnEnter').onclick=()=>{ aInit(); sfx.ui(); phase='lobby'; renderLobby(); show('scr-lobby');
+  // v0.5.5.4: first time through the door, walk them around the menu once
+  if(typeof META==='object' && META && !META.lobbySeen){
+    setTimeout(()=>{ try{ if(phase==='lobby') openLobbyGuide(); }catch(e){} }, 480);
+  }
+};
 // v0.5.0: operator / cohort ID — persisted, stamped into run records
 if($('opId')){
   $('opId').addEventListener('input',()=>{ META.opId=$('opId').value.slice(0,40); metaSave(); });
@@ -3561,29 +3590,55 @@ const HG_STEPS=[
   {el:'bodywrap',  t:'The patient',     d:'Wounds and findings appear on the body. <b>Tap a region</b> to assess it; <b>drag a tool</b> from your kit onto a wound to treat exactly there.'},
   {el:'acuity',    t:'The read-out',    d:'How sick they are right now, in plain words, with a one-line status beneath. <i>Hidden in Assessment</i> \u2014 then you read the monitor yourself.'},
   {el:'handsbox',  t:'Your hands',      d:'Some actions need one hand, some need two. Holding pressure or bagging <b>occupies a hand</b> until you let go \u2014 this shows what is currently tied up.'},
-  {el:'rightpanel',t:'The Med-Bag',     d:'Your treatments, sorted by <b>MARCH</b>. Tap a tool to use it, or drag it onto a wound to target. The <b>How to read your kit</b> tutorial covers this menu in detail.'},
+  {el:'rightpanel',t:'Your kit',        d:'Your treatments, sorted by <b>MARCH</b>. Tap a tool to use it, or drag it onto a wound to target. The <b>How to read your kit</b> tutorial covers this menu in detail.'},
   {el:'channelbox',t:'The action bar',  d:'A timed action in progress \u2014 packing a wound, starting a line. <b>Tap anywhere to abort</b> it if you change your mind.'},
   {el:'critlist',  t:'Handoff criteria',d:'The <b>MARCH checklist</b> for a patient ready to travel \u2014 met items turn green. Shown as prompts, or hidden, depending on the options you picked.'},
   {el:'btnEvac',   t:'Call for evac',   d:'When they are stable enough to move, request transport. The goal was never to cure them here \u2014 only to <b>keep them alive to handoff</b>.'},
 ];
-let hgList=[], hgIdx=0, hgPausedSim=false;
+// v0.5.5.4: main-menu (lobby) tour — runs once after the intro, replayable from "? Tour the menu"
+const LG_STEPS=[
+  {el:'rankstrip', t:'Your standing',      d:'Everything you do here feeds one read: your <b>readiness</b>. This strip is your current standing and the skills you\u2019ve drilled. It climbs as you train \u2014 and quietly decays where you go silent, so it reflects what you can do <i>now</i>.'},
+  {el:'lessonGrid',t:'Start with the campaign', d:'Thirteen lessons, ordered the way the real curricula are: <b>bystander first aid \u2192 Stop the Bleed \u2192 the TCCC tiers</b>. Each one briefs you, then grades you. If you\u2019re new, walk these in order \u2014 they build on each other.'},
+  {el:'tierCards', t:'Free play',           d:'Once you\u2019ve unlocked a tier, drill it here as much as you like \u2014 <b>unrated practice</b>, with a rewindable timeline in the after-action review so you can see exactly where a run turned.'},
+  {el:'optsPanel', t:'Scenario options',    d:'Modifiers for your next drill or check-ride: a <b>pediatric</b> patient, going in <b>blind</b>, hiding the MARCH checklist, or full <b>Assessment</b> \u2014 monitor and patient only. They don\u2019t touch the scripted lessons.'},
+  {el:'trainRow',  t:'Rated check-ride',    d:'Flip this on to make a free-play run <b>count</b>: it credits your mastery profile, and clearing the next locked tier (score \u2265 70) unlocks it. Leave it off to just practise.'},
+  {el:'mciLobbyCard',t:'The capstone \u2014 triage', d:'When you can run one patient cold, take on many. <b>Mass-casualty triage</b> is about <i>sorting</i> with START/SALT, not treating \u2014 the discipline that decides who gets the first hands. The hardest thing here.'},
+  {el:'btnKitTut', t:'Reference, any time',  d:'Not sure what a tool does? <b>How to read your kit</b> walks the treatment menu. Beside it, <b>Profile &amp; History</b> is your record, and <b>the Codex</b> is the doctrine library \u2014 all here whenever you need them.'},
+  {el:'themeRow',  t:'Make it yours',        d:'<b>Light</b> or <b>Dark</b>, whichever\u2019s easier on your eyes \u2014 it sticks between sessions. Just above, <b>Advanced</b> options let you export, import, or reset your profile. That\u2019s the tour \u2014 start with Lesson 1.'},
+];
+let hgList=[], hgIdx=0, hgPausedSim=false, hgOnClose=null, hgName='Field guide';
 function hgVisible(id){ const e=$(id); if(!e) return false; const r=e.getBoundingClientRect(); return r.width>2 && r.height>2; }
+function openSpotlight(steps, opts){
+  opts=opts||{};
+  hgList=steps.filter(s=>hgVisible(s.el)); if(!hgList.length) return;
+  if(opts.pauseSim && S && !S.paused && !S.over){ S.paused=true; hgPausedSim=true; }
+  hgOnClose=opts.onClose||null; hgName=opts.name||'Field guide';
+  hgIdx=0; $('hudGuide').style.display='block'; renderHudStep();
+}
 function openHudGuide(){
   if(phase!=='game' || !S) return;                    // only meaningful on the treatment screen
-  hgList=HG_STEPS.filter(s=>hgVisible(s.el)); if(!hgList.length) return;
-  if(S && !S.paused && !S.over){ S.paused=true; hgPausedSim=true; }
-  hgIdx=0; $('hudGuide').style.display='block'; renderHudStep();
+  openSpotlight(HG_STEPS, {pauseSim:true, name:'Field guide',
+    onClose:()=>{ if(typeof META==='object'&&META){ META.hudSeen=true; try{ metaSave(); }catch(e){} } }});
+}
+function openLobbyGuide(){
+  if(phase!=='lobby') return;                          // walks the main menu
+  openSpotlight(LG_STEPS, {name:'Menu guide',
+    onClose:()=>{ if(typeof META==='object'&&META){ META.lobbySeen=true; try{ metaSave(); }catch(e){} } }});
 }
 function closeHudGuide(){ $('hudGuide').style.display='none';
   if(hgPausedSim && S){ S.paused=false; hgPausedSim=false; }
-  if(typeof META==='object' && META){ META.hudSeen=true; try{ metaSave(); }catch(e){} } }
+  const cb=hgOnClose; hgOnClose=null; if(cb){ try{ cb(); }catch(e){} } }
 function renderHudStep(){
   if(hgIdx<0) hgIdx=0; if(hgIdx>=hgList.length){ closeHudGuide(); return; }
   const step=hgList[hgIdx], e=$(step.el); if(!e){ hgIdx++; return renderHudStep(); }
-  const r=e.getBoundingClientRect(), pad=6, spot=$('hgSpot');
+  let r=e.getBoundingClientRect();
+  // the lobby scrolls; bring an off-screen target into view before measuring (no-op on the fixed game grid)
+  if(r.top<70 || r.bottom>window.innerHeight-70){ try{ e.scrollIntoView({block:'center'}); }catch(_){} r=e.getBoundingClientRect(); }
+  const pad=6, spot=$('hgSpot');
   spot.style.top=(r.top-pad)+'px'; spot.style.left=(r.left-pad)+'px';
   spot.style.width=(r.width+pad*2)+'px'; spot.style.height=(r.height+pad*2)+'px';
   $('hgStep').textContent=(hgIdx+1)+' / '+hgList.length;
+  if($('hgName')) $('hgName').textContent=hgName;
   $('hgTitle').textContent=step.t; $('hgBody').innerHTML=step.d;
   $('hgPrev').disabled=(hgIdx===0);
   $('hgNext').textContent=(hgIdx===hgList.length-1)?'Done':'Next';
@@ -3592,6 +3647,7 @@ function renderHudStep(){
   else { card.style.top='auto'; card.style.bottom=Math.min(vh-r.top+14, vh-card.offsetHeight-12)+'px'; }
 }
 if($('btnGuide')) $('btnGuide').onclick=()=>{ sfx.ui(); openHudGuide(); };
+if($('btnLobbyGuide')) $('btnLobbyGuide').onclick=()=>{ sfx.ui(); openLobbyGuide(); };
 if($('hgNext'))  $('hgNext').onclick=()=>{ sfx.ui(); hgIdx++; renderHudStep(); };
 if($('hgPrev'))  $('hgPrev').onclick=()=>{ sfx.ui(); hgIdx--; renderHudStep(); };
 if($('hgClose')) $('hgClose').onclick=()=>{ sfx.ui(); closeHudGuide(); };
